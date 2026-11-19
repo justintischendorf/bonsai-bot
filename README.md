@@ -1,133 +1,227 @@
 # Bonsai Bot
 
-Discord-Bot mit Web-Dashboard für einen einzelnen Discord-Server. Mitglieder melden sich mit ihrem Discord-Account an, verwalten eine gemeinsame Spiele-Wunschliste, steuern die Musik im Voice-Channel über die Website und schauen zusammen YouTube-Videos.
+A Discord bot with a web dashboard for a single Discord server. Members sign
+in with their Discord account, keep a shared game wishlist, control the music
+in the voice channel from the website and watch YouTube videos together.
 
-## Funktionen
+Built as a [Turborepo](https://turborepo.dev/) monorepo on
+[Bun](https://bun.sh/): Next.js dashboard, Elysia API, discord.js bot with
+Lavalink, SQLite through Prisma and Better Auth for the Discord login.
 
-- **Discord-Login:** Anmeldung per Discord, nur für Mitglieder des konfigurierten Servers
-- **Dashboard:** Serverinfos, Mitgliederliste und täglicher Spielevorschlag aus den bereits erschienenen Spielen der Wunschliste
-- **Wunschliste:** Spiele per Link zu Steam, Instant Gaming oder dem PlayStation Store hinzufügen und angeben, ob Crossplay möglich ist. Titelbild und Preise werden automatisch übernommen und alle 30 Minuten aktualisiert, Preissenkungen werden in einem Discord-Channel gemeldet. Spiele lassen sich liken, beim Daumen sieht man mit Profilbild, wem das Spiel noch gefällt. Vor dem Entfernen eines Spiels fragt das Dashboard noch einmal nach
-- **Bonsai FM:** Warteschlange mit YouTube-Links, dazu Beitreten, Verlassen, Abspielen, Stoppen und Überspringen über die Website
-- **Bonsai Watch:** YouTube-Videos gemeinsam schauen. Videos kommen per Link auf eine Warteschlange, die sich per Drag-and-drop sortieren lässt. Abspielen, Pausieren und Springen im Video gelten für alle, die gerade zuschauen, und kommen über einen WebSocket sofort bei allen an. Am Ende eines Videos startet automatisch das nächste
-- **Slash-Commands:** `/ping` und `/link`
+**[Features](#features) · [Architecture](#architecture) ·
+[Environment](#environment-variables) · [Development](#development) ·
+[Production](#production) · [Scripts](#scripts)**
 
-## Aufbau
+## Features
 
-| Pfad                | Inhalt                                         |
-| ------------------- | ---------------------------------------------- |
-| `apps/web`          | Web-Dashboard (Next.js, React)                 |
-| `apps/api`          | API (Elysia)                                   |
-| `apps/bot`          | Discord-Bot (discord.js, lavalink-client)      |
-| `packages/database` | Prisma-Schema, Migrationen und Client (SQLite) |
-| `packages/auth`     | Better-Auth-Konfiguration                      |
-| `packages/treaty`   | Eden-Treaty-Anbindung an die API               |
-| `packages/logger`   | Gemeinsames Logging                            |
+- **Discord login:** only members of the configured server can sign in.
+- **Dashboard:** server info, the member list and a daily game suggestion
+  from the released games on the wishlist.
+- **Wishlist:** add games by a link to Steam, Instant Gaming or the
+  PlayStation Store and mark whether crossplay is available. Title image and
+  prices are fetched automatically and refreshed every 30 minutes, price
+  drops are posted to a Discord channel. Games can be liked, and hovering the
+  thumb shows who else likes them.
+- **Bonsai FM:** a queue of YouTube links plus join, leave, play, stop and
+  skip from the website. When the jam queue is empty, the bot keeps playing
+  songs from the YouTube mix of the last song.
+- **Bonsai Watch:** watch YouTube videos together. Videos go onto a queue
+  that can be sorted by drag and drop. Play, pause and seek apply to everyone
+  watching and reach all browsers instantly over a WebSocket.
+- **Slash commands:** `/ping` and `/link`.
 
-Für die Musikwiedergabe kommen zusätzlich Lavalink und yt-cipher als Docker-Container zum Einsatz.
+## Architecture
 
-## Voraussetzungen
+```mermaid
+flowchart LR
+  browser[Browser] -->|/| web[Web dashboard<br/>Next.js]
+  browser -->|/api, WebSocket| api[API<br/>Elysia]
+  web -->|Treaty| api
+  web -->|session check| auth[Better Auth]
+  api --> auth
+  api --> db[(SQLite)]
+  api -->|internal HTTP| bot[Discord bot<br/>discord.js]
+  api -->|REST| discord[Discord]
+  bot --> discord
+  bot --> db
+  bot --> lavalink[Lavalink]
+  lavalink --> cipher[yt-cipher]
+  lavalink --> youtube[YouTube]
+```
 
-- [Bun](https://bun.sh) 1.4.2
-- Node.js 24 oder neuer
-- Docker mit Docker Compose
-- Eine Anwendung im [Discord Developer Portal](https://discord.com/developers/applications) mit Bot und OAuth2
+Web dashboard and API run under the same domain (`/` and `/api`). The API
+talks to Discord for server data and to the bot over an internal HTTP server
+secured by `BOT_INTERNAL_SECRET`. The bot plays music through Lavalink, which
+uses yt-cipher to resolve YouTube streams.
 
-## Lokale Entwicklung
+| Path                | Content                                         |
+| ------------------- | ----------------------------------------------- |
+| `apps/web`          | Web dashboard (Next.js, React)                  |
+| `apps/api`          | API (Elysia on Bun)                             |
+| `apps/bot`          | Discord bot (discord.js, lavalink-client)       |
+| `packages/database` | Prisma schema, migrations and client (SQLite)   |
+| `packages/auth`     | Authentication (Better Auth with Discord OAuth) |
+| `packages/treaty`   | Typed API client for the dashboard              |
+| `packages/logger`   | Shared logger                                   |
 
-1. Abhängigkeiten installieren:
+## Environment variables
 
-   ```sh
-   bun install
-   ```
+For development, copy the `.env.example` in `apps/api`, `apps/bot`,
+`apps/web` and `packages/database` to `.env` in the same folder. For
+production, the root `.env.example` lists everything the compose file needs.
 
-2. Die `.env.example` in diesen Ordnern jeweils nach `.env` kopieren und ausfüllen:
-   - `apps/api`
-   - `apps/bot`
-   - `apps/web`
-   - `packages/database`
+| Variable                      | Used by       | Description                                                           |
+| ----------------------------- | ------------- | --------------------------------------------------------------------- |
+| `DATABASE_URL`                | api, bot, web | SQLite file, e.g. `"file:../../packages/database/data.db"`            |
+| `API_SERVER_PORT`             | api           | `3001`                                                                |
+| `WEB_SERVER_URL`              | api, bot, web | Address of the dashboard, e.g. `http://localhost:3000`                |
+| `BETTER_AUTH_URL`             | api, web      | Address of the API, e.g. `http://localhost:3001` ¹                    |
+| `BETTER_AUTH_SECRET`          | api, web      | Random value ²                                                        |
+| `NEXT_PUBLIC_API_SERVER_URL`  | web           | Address of the API as seen by the browser ³                           |
+| `NEXT_PUBLIC_AUTH_BASE_URL`   | web           | Address of Better Auth as seen by the browser ³                       |
+| `DISCORD_CLIENT_ID`           | api, bot, web | From the Discord Developer Portal                                     |
+| `DISCORD_CLIENT_SECRET`       | api, web      | From the Discord Developer Portal                                     |
+| `DISCORD_GUILD_ID`            | api, bot, web | ID of the Discord server                                              |
+| `DISCORD_BOT_TOKEN`           | api           | Bot token, used for server data and the member list                   |
+| `DISCORD_TOKEN`               | bot           | Bot token (same value as `DISCORD_BOT_TOKEN`)                         |
+| `WISHLIST_CHANNEL_ID`         | api           | Channel for price drop messages                                       |
+| `BOT_INTERNAL_URL`            | api           | Internal bot server, `http://127.0.0.1:3002`                          |
+| `BOT_INTERNAL_PORT`           | bot           | `3002`                                                                |
+| `BOT_INTERNAL_SECRET`         | api, bot      | Random value ², must be the same in both                              |
+| `LAVALINK_HOST`               | bot           | `127.0.0.1`, set by the compose file in Docker                        |
+| `LAVALINK_PORT`               | bot           | `2333`                                                                |
+| `LAVALINK_PASSWORD`           | bot, lavalink | Random value ² in production                                          |
+| `YT_CIPHER_TOKEN`             | lavalink      | Random value ², shared by Lavalink and yt-cipher                      |
+| `YOUTUBE_OAUTH_ENABLED`       | lavalink      | Optional, see [YouTube blocks the server](#youtube-blocks-the-server) |
+| `YOUTUBE_OAUTH_REFRESH_TOKEN` | lavalink      | Optional, see [YouTube blocks the server](#youtube-blocks-the-server) |
 
-3. Prisma-Client erzeugen und Datenbank anlegen:
+¹ In production `WEB_SERVER_URL` and `BETTER_AUTH_URL` are the same address,
+e.g. `https://bonsai.example.com`.
+² Generate with `openssl rand -base64 32`. Never reuse development values in
+production.
+³ `NEXT_PUBLIC_*` values are baked into the dashboard at build time. Restart
+`bun run dev` or rebuild the image after changing them.
 
-   ```sh
-   bun run db:generate
-   bun run db:migrate
-   ```
+## Development
 
-4. Bot, Lavalink und yt-cipher in Docker starten:
+API and dashboard run locally with hot reload, the bot, Lavalink and
+yt-cipher run in Docker. You need [Bun](https://bun.sh/) 1.4.2, Node.js 24,
+Docker with Docker Compose and an application in the
+[Discord Developer Portal](https://discord.com/developers/applications) with
+a bot and OAuth2.
 
-   ```sh
-   bun run docker:dev
-   ```
+```sh
+bun install
 
-5. Web-Dashboard und API starten:
+# 1. Create the .env files (see the table above)
+for d in apps/api apps/bot apps/web packages/database; do cp "$d/.env.example" "$d/.env"; done
 
-   ```sh
-   bun run dev
-   ```
+# 2. Generate the Prisma client and create the database
+bun run db:generate
+bun run db:migrate
 
-   Das Dashboard läuft auf `http://localhost:3000`, die API auf `http://localhost:3001`.
+# 3. Start the bot, Lavalink and yt-cipher
+bun run docker:dev
 
-6. Slash-Commands einmalig oder nach Änderungen registrieren:
+# 4. Start the API (http://localhost:3001) and the dashboard (http://localhost:3000)
+bun run dev
+```
 
-   ```sh
-   cd apps/bot
-   bun run deploy
-   ```
+Register the slash commands once and after every change to them:
 
-## Produktion
+```sh
+cd apps/bot && bun run deploy
+```
 
-Das Deployment läuft über [Dokploy](https://dokploy.com) mit der Datei `docker-compose-prod.yml`.
+### Changing the schema
 
-1. In Dokploy einen Service vom Typ **Docker Compose** anlegen, nicht **Stack**. Als Compose Path `./docker-compose-prod.yml` eintragen und **Isolated Deployments** ausgeschaltet lassen.
+Edit `packages/database/prisma/schema.prisma`, run `bun run db:migrate` and
+commit the new migration.
 
-2. Die Variablen aus der `.env.example` im Environment-Tab setzen. `WEB_SERVER_URL` und `BETTER_AUTH_URL` bekommen dieselbe Adresse, zum Beispiel `https://bonsai.example.com`.
+## Production
 
-3. Im Domains-Tab zwei Einträge mit derselben Domain anlegen:
+The deployment runs on [Dokploy](https://dokploy.com/) with
+`docker-compose-prod.yml`. A `migrate` service applies new migrations on
+every deployment before the API and the dashboard start.
 
-   | Service | Pfad   | Port   | Strip Path |
+1. Create a service of type **Docker Compose** (not **Stack**), set the
+   compose path to `./docker-compose-prod.yml` and leave
+   **Isolated Deployments** off.
+2. Set the variables from the root `.env.example` in the environment tab.
+3. Add two entries with the same domain in the domains tab:
+
+   | Service | Path   | Port   | Strip path |
    | ------- | ------ | ------ | ---------- |
-   | `web`   | `/`    | `3000` | aus        |
-   | `api`   | `/api` | `3001` | aus        |
+   | `web`   | `/`    | `3000` | off        |
+   | `api`   | `/api` | `3001` | off        |
 
-4. Im Discord Developer Portal unter OAuth2 diese Redirect-URL eintragen: `https://bonsai.example.com/api/auth/callback/discord`
-
-5. Deployen.
-
-6. Slash-Commands einmalig und nach Änderungen auf dem Server registrieren, im Ordner mit der Compose-Datei und der `.env`:
+4. Add the redirect URL `https://bonsai.example.com/api/auth/callback/discord`
+   under OAuth2 in the Discord Developer Portal.
+5. Deploy.
+6. Register the slash commands once and after every change to them, in the
+   folder with the compose file and the `.env`:
 
    ```sh
    docker compose -f docker-compose-prod.yml run --rm deploy-commands
    ```
 
-Web-Dashboard und API müssen unter derselben Domain laufen, weil das Web-Dashboard das Session-Cookie der API selbst prüft. Auf getrennten Subdomains käme das Cookie dort nicht an. Eine Änderung von `BETTER_AUTH_URL` erfordert einen neuen Build, weil die Adresse fest ins Frontend geschrieben wird.
+> [!IMPORTANT]
+> Dashboard and API must run under the same domain, because the dashboard
+> checks the session cookie of the API itself. On separate subdomains the
+> cookie would not arrive. Changing `BETTER_AUTH_URL` needs a new build.
 
-Sichern lassen sich die Daten über die Volume Backups von Dokploy, betroffen sind die Volumes `database` und `bot-data`.
+Back up the `database` and `bot-data` volumes with the volume backups of
+Dokploy.
 
-Neue Migrationen, zum Beispiel die Tabelle für die Warteschlange von Bonsai Watch, spielt der Service `migrate` bei jedem Deployment automatisch ein, bevor API und Web-Dashboard starten.
+### Bonsai Watch
 
-Bei Bonsai Watch liegt nur die Warteschlange in der Datenbank. Welches Video gerade läuft und an welcher Stelle, merkt sich die API im Arbeitsspeicher. Nach einem Neustart der API geht es mit dem nächsten Video der Warteschlange weiter. Titel und Kanal eines Videos holt die API über die oEmbed-Schnittstelle von YouTube, dafür ist kein API-Key nötig.
+Only the queue is stored in the database. Which video is playing and where,
+the API keeps in memory, so after a restart it continues with the next video
+in the queue. Video titles come from the YouTube oEmbed endpoint, no API key
+is needed.
 
-Änderungen an Wiedergabe und Warteschlange schickt die API über den WebSocket `/api/watch/live` an alle, die die Seite offen haben. Über denselben WebSocket gleicht jeder Browser seine Uhr mit der Uhr des Servers ab, damit alle trotz Netzwerk-Verzögerung an derselben Stelle im Video sind. Der Reverse Proxy muss deshalb WebSocket-Verbindungen zur API durchlassen, was Traefik in Dokploy standardmäßig tut. API und Web-Dashboard sollten immer zusammen aktualisiert werden.
+Changes to playback and queue are sent over the WebSocket `/api/watch/live`,
+which also syncs every browser's clock with the server. The reverse proxy
+has to pass WebSocket connections to the API, which Traefik in Dokploy does
+by default. Always update API and dashboard together.
 
-Die Videos bei Bonsai Watch spielt der eingebettete YouTube-Player im Browser der Zuschauer ab, nicht der Server. Zeigt der Player „Sign in“ bzw. „Melde dich an, damit wir sehen, dass du kein Bot bist“, sieht er den YouTube-Login der Person nicht. Meist blockiert der Browser Drittanbieter-Cookies (Standard bei Safari, Firefox, Brave und Edge sowie in Inkognito-Fenstern). Dann hilft eine erneute Anmeldung nicht. Die Person muss Drittanbieter-Cookies für die Seite erlauben, sich auf youtube.com anmelden und die Seite neu laden. Eine Anleitung pro Browser zeigt die Seite unter dem Player an.
+The videos play in the embedded YouTube player in each viewer's browser. If
+the player shows "Sign in to confirm you're not a bot", the browser usually
+blocks third-party cookies (the default in Safari, Firefox, Brave, Edge and
+private windows). The viewer has to allow third-party cookies for the site,
+sign in on youtube.com and reload. The page shows instructions per browser
+below the player.
 
-Falls YouTube die IP des Servers bei Bonsai FM blockiert, lässt sich in der `.env` optional OAuth aktivieren. Die Variablen dafür stehen in der `.env.example`. Auf Bonsai Watch hat das keinen Einfluss.
+### YouTube blocks the server
 
-## Befehle
+If YouTube blocks the server's IP for Bonsai FM, set
+`YOUTUBE_OAUTH_ENABLED=true` and `YOUTUBE_OAUTH_REFRESH_TOKEN` in the `.env`.
+Bonsai Watch is not affected.
 
-| Befehl                | Beschreibung                        |
-| --------------------- | ----------------------------------- |
-| `bun run dev`         | Web-Dashboard und API starten       |
-| `bun run build`       | Alle Apps bauen                     |
-| `bun run lint`        | Code mit oxlint prüfen              |
-| `bun run format`      | Code mit oxfmt formatieren          |
-| `bun run check-types` | Typen prüfen                        |
-| `bun run db:generate` | Prisma-Client erzeugen              |
-| `bun run db:migrate`  | Migrationen erstellen und anwenden  |
-| `bun run db:studio`   | Prisma Studio öffnen                |
-| `bun run docker:dev`  | Entwicklungs-Container starten      |
-| `bun run docker:prod` | Produktions-Stack bauen und starten |
+## Scripts
 
-## Sicherheit
+| Command                    | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `bun run dev`              | Start the API and the dashboard             |
+| `bun run build`            | Build all apps                              |
+| `bun run lint`             | Lint with oxlint                            |
+| `bun run lint:fix`         | Fix auto-fixable lint errors                |
+| `bun run format`           | Format with oxfmt                           |
+| `bun run format:check`     | Check the formatting                        |
+| `bun run check-types`      | Check the TypeScript types                  |
+| `bun run db:generate`      | Generate the Prisma client                  |
+| `bun run db:migrate`       | Apply migrations or create a new one        |
+| `bun run db:migrate:reset` | Reset the database and apply all migrations |
+| `bun run db:studio`        | Open Prisma Studio                          |
+| `bun run docker:dev`       | Start the bot, Lavalink and yt-cipher       |
+| `bun run docker:prod`      | Build and start the production stack        |
 
-`.env`-Dateien und `*.db`-Dateien dürfen nicht committet werden, sie sind per `.gitignore` ausgeschlossen. Die lokale Datenbank enthält Sessions und Discord-Tokens.
+## Contributing
+
+Branches, commits, pull requests, CI and releases are described in
+[CONTRIBUTING.md](CONTRIBUTING.md), all changes in
+[CHANGELOG.md](CHANGELOG.md).
+
+> [!CAUTION]
+> Never commit `.env` or `*.db` files, they are excluded by `.gitignore`. The
+> local database contains sessions and Discord tokens.
