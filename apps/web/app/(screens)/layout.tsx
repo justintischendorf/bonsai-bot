@@ -83,7 +83,7 @@ export default function DashboardLayout({
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm text-neutral-500">
             <span>© {currentYear} Bonsai Bot. Alle Rechte vorbehalten.</span>
             <span aria-hidden>·</span>
-            <span className="tabular-nums">v1.6.0</span>
+            <span className="tabular-nums">v1.7.0</span>
           </div>
         </footer>
       </main>
