@@ -1,6 +1,7 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
+import { Ghost } from "ghostlyjs";
 import gsap from "gsap";
 import { Gamepad2, MoveRight, Radio, TvMinimalPlay } from "lucide-react";
 import Image from "next/image";
@@ -9,15 +10,16 @@ import { useRef } from "react";
 
 import bonsaiBotTitle from "@/assets/logos/bonsai-bot-title.svg";
 import { BonsaiLogo } from "@/components/bonsai-logo";
-import MemberCard, { MemberCardSkeleton } from "@/components/member-card";
+import MemberCard from "@/components/member-card";
 import NowPlaying from "@/components/now-playing";
-import { Skeleton } from "@/components/ui/skeleton";
+import NowWatching from "@/components/now-watching";
 import WishlistSuggestion from "@/components/wishlist-suggestion";
 import { useDiscordMemberInfo } from "@/hooks/use-discord-member-info";
 import { useFloatToTextBottom } from "@/hooks/use-float-to-text-bottom";
 import { useLimitVisibleItems } from "@/hooks/use-limit-visible-items";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useMusicQueue } from "@/hooks/use-music-queue";
+import { useWatchLive, useWatchQueue } from "@/hooks/use-watch-queue";
 import { useWishlistSuggestion } from "@/hooks/use-wishlist-suggestion";
 
 gsap.registerPlugin(useGSAP);
@@ -65,8 +67,11 @@ export default function DashboardPage() {
 
   const { data: wishlistSuggestionResponse } = useWishlistSuggestion();
   const { data: musicResponse } = useMusicQueue();
+  const { data: watchResponse } = useWatchQueue();
+  useWatchLive();
   const hasSuggestion = !!wishlistSuggestionResponse?.data?.server;
   const hasSong = !!musicResponse?.data?.server?.current;
+  const hasVideo = !!watchResponse?.data?.server?.current;
 
   const pageRef = useRef<HTMLElement>(null);
 
@@ -89,10 +94,11 @@ export default function DashboardPage() {
 
   return (
     <main ref={pageRef}>
-      {(hasSuggestion || hasSong) && (
+      {(hasSuggestion || hasSong || hasVideo) && (
         <div className="flex-col sm:flex-row flex gap-5 pb-5 px-4 sm:px-8 xl:px-20">
           <WishlistSuggestion href="/wishlist" />
           <NowPlaying href="/bonsai-fm" />
+          <NowWatching href="/bonsai-watch" />
         </div>
       )}
       <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-16">
@@ -160,26 +166,29 @@ export default function DashboardPage() {
         </nav>
         <div className="w-full flex justify-center flex-wrap px-4 gap-2 sm:px-8 lg:col-start-2 lg:row-start-1 lg:justify-end xl:px-20">
           <div className="w-full flex justify-center items-center mb-4 lg:justify-end">
-            {isDiscordServerMembersLoading ? (
-              <Skeleton className="w-42 h-8" />
-            ) : (
+            <Ghost
+              name="discord-server-member-count"
+              isLoading={isDiscordServerMembersLoading}
+            >
               <p className="text-lg font-semibold">
                 {serverMembers?.length} Mitglieder
               </p>
-            )}
+            </Ghost>
           </div>
 
           <div
             ref={memberListRef}
             className="grid w-full grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2"
           >
-            {isDiscordServerMembersLoading
-              ? Array.from({ length: 10 }, (_, index) => (
-                  <MemberCardSkeleton key={index} />
-                ))
-              : serverMembers?.map((member) => (
-                  <MemberCard member={member} key={member.id} />
-                ))}
+            <Ghost
+              name="discord-server-members"
+              isLoading={isDiscordServerMembersLoading}
+              count={MAX_VISIBLE_MEMBERS}
+            >
+              {serverMembers?.map((member) => (
+                <MemberCard member={member} key={member.id} />
+              ))}
+            </Ghost>
           </div>
         </div>
       </div>

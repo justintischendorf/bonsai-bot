@@ -92,7 +92,7 @@ export function WishlistItemDialog() {
       <DialogTrigger
         render={
           <Button
-            className="new-game-button opacity-0 w-full shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:w-auto"
+            className="w-full shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:w-auto"
             variant="outline"
             type="button"
           >

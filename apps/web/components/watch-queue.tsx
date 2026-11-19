@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Ghost } from "ghostlyjs";
 import { GripVertical, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -33,7 +34,6 @@ import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 
 import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 import { toast } from "./ui/toast";
 import WatchQueueEmpty from "./watch-queue-empty";
 
@@ -217,61 +217,49 @@ export default function WatchQueue() {
   }
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-4">
-      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
-        <h2 className="text-lg font-semibold">Warteschlange</h2>
-        {isWatchQueueLoading ? (
-          <Skeleton className="h-5 w-16" />
-        ) : (
+    <Ghost name="watch-queue" isLoading={isWatchQueueLoading}>
+      <section className="flex min-w-0 flex-1 flex-col gap-4">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
+          <h2 className="text-lg font-semibold">Warteschlange</h2>
+
           <span className="text-sm text-muted-foreground">
             {videos.length} {videos.length === 1 ? "Video" : "Videos"}
           </span>
-        )}
-      </div>
-      {!isWatchQueueLoading && videos.length === 0 && <WatchQueueEmpty />}
-      <DndContext
-        id="watch-queue"
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        modifiers={[verticalOnly]}
-        accessibility={{
-          announcements: dragAnnouncements,
-          screenReaderInstructions: dragInstructions,
-        }}
-        onDragStart={() => setVideosWhileDragging(videos)}
-        onDragEnd={handleDragEnd}
-        onDragCancel={() => setVideosWhileDragging(null)}
-      >
-        <SortableContext
-          items={videos.map((video) => video.id)}
-          strategy={verticalListSortingStrategy}
+        </div>
+        {!isWatchQueueLoading && videos.length === 0 && <WatchQueueEmpty />}
+        <DndContext
+          id="watch-queue"
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[verticalOnly]}
+          accessibility={{
+            announcements: dragAnnouncements,
+            screenReaderInstructions: dragInstructions,
+          }}
+          onDragStart={() => setVideosWhileDragging(videos)}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setVideosWhileDragging(null)}
         >
-          <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
-            {isWatchQueueLoading &&
-              Array.from({ length: MAX_VISIBLE_VIDEOS }, (_, index) => (
-                <div
-                  key={index}
-                  className="flex shrink-0 items-center gap-3 rounded-xl p-3"
-                >
-                  <Skeleton className="aspect-video w-20 shrink-0 rounded-md" />
-                  <div className="flex flex-1 flex-col gap-2">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
-            {videos.map((video, index) => (
-              <SortableVideo
-                key={video.id}
-                video={video}
-                index={index}
-                isRemoveDisabled={isRemovingVideo}
-                onRemove={removeVideo}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
-    </section>
+          <SortableContext
+            items={videos.map((video) => video.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
+              <Ghost name="watch-queue" isLoading={isWatchQueueLoading}>
+                {videos.map((video, index) => (
+                  <SortableVideo
+                    key={video.id}
+                    video={video}
+                    index={index}
+                    isRemoveDisabled={isRemovingVideo}
+                    onRemove={removeVideo}
+                  />
+                ))}
+              </Ghost>
+            </div>
+          </SortableContext>
+        </DndContext>
+      </section>
+    </Ghost>
   );
 }

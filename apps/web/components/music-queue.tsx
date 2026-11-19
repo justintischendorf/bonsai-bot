@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Ghost } from "ghostlyjs";
 import { GripVertical, X } from "lucide-react";
 import { useState } from "react";
 
@@ -34,7 +35,6 @@ import { MusicQueueDialog } from "./music-queue-dialog";
 import MusicQueueEmpty from "./music-queue-empty";
 import SongCover from "./song-cover";
 import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 import { toast } from "./ui/toast";
 
 const MAX_VISIBLE_SONGS = 6;
@@ -233,64 +233,51 @@ export default function MusicQueue() {
   }
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
-          <h2 className="text-lg font-semibold">Warteschlange</h2>
-          {isMusicQueueLoading ? (
-            <Skeleton className="h-5 w-16" />
-          ) : (
+    <Ghost name="music-queue-song-count" isLoading={isMusicQueueLoading}>
+      <section className="flex min-w-0 flex-1 flex-col gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
+            <h2 className="text-lg font-semibold">Warteschlange</h2>
             <span className="text-sm text-muted-foreground">
               {songs.length} {songs.length === 1 ? "Song" : "Songs"}
             </span>
-          )}
-        </div>
-        <MusicQueueDialog />
-      </div>
-      {!isMusicQueueLoading && songs.length === 0 && <MusicQueueEmpty />}
-      <DndContext
-        id="music-queue"
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        modifiers={[verticalOnly]}
-        accessibility={{
-          announcements: dragAnnouncements,
-          screenReaderInstructions: dragInstructions,
-        }}
-        onDragStart={() => setSongsWhileDragging(songs)}
-        onDragEnd={handleDragEnd}
-        onDragCancel={() => setSongsWhileDragging(null)}
-      >
-        <SortableContext
-          items={songs.map((song) => song.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
-            {isMusicQueueLoading &&
-              Array.from({ length: MAX_VISIBLE_SONGS }, (_, index) => (
-                <div
-                  key={index}
-                  className="flex shrink-0 items-center gap-3 rounded-xl p-3"
-                >
-                  <Skeleton className="size-10 shrink-0 rounded-md" />
-                  <div className="flex flex-1 flex-col gap-2">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
-            {songs.map((song, index) => (
-              <SortableSong
-                key={song.id}
-                song={song}
-                index={index}
-                isRemoveDisabled={isRemovingSong}
-                onRemove={removeSong}
-              />
-            ))}
           </div>
-        </SortableContext>
-      </DndContext>
-    </section>
+          <MusicQueueDialog />
+        </div>
+        {!isMusicQueueLoading && songs.length === 0 && <MusicQueueEmpty />}
+        <DndContext
+          id="music-queue"
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[verticalOnly]}
+          accessibility={{
+            announcements: dragAnnouncements,
+            screenReaderInstructions: dragInstructions,
+          }}
+          onDragStart={() => setSongsWhileDragging(songs)}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setSongsWhileDragging(null)}
+        >
+          <SortableContext
+            items={songs.map((song) => song.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
+              <Ghost name="music-queue" isLoading={isMusicQueueLoading}>
+                {songs.map((song, index) => (
+                  <SortableSong
+                    key={song.id}
+                    song={song}
+                    index={index}
+                    isRemoveDisabled={isRemovingSong}
+                    onRemove={removeSong}
+                  />
+                ))}
+              </Ghost>
+            </div>
+          </SortableContext>
+        </DndContext>
+      </section>
+    </Ghost>
   );
 }

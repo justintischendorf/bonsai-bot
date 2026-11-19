@@ -8,6 +8,33 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-19
+
+### Added
+
+- "Now watching" card on the dashboard next to the daily suggestion and
+  "Now playing": it shows the thumbnail, title and channel of the video
+  playing in Bonsai Watch, whether it is paused, and links to Bonsai Watch.
+  The card updates instantly over the `/api/watch/live` WebSocket. ([#42])
+- The footer shows the version of the dashboard. ([#41])
+
+### Changed
+
+- Loading skeletons are measured from the real UI with
+  [GhostlyJs](https://github.com/justintischendorf/ghostlyjs) instead of
+  being written by hand, so they match the layout at every window width.
+  The measurements live in `apps/web/ghostly.json`. ([#41], [#42])
+- Bun 1.4.4 instead of 1.4.2 everywhere: in the Docker images, in CI and
+  in `package.json`. ([#36], [#40])
+- Dependency updates, among them Next.js 16.4.6, React 19.3.1, Elysia
+  1.4.32, Better Auth 1.7.25, discord.js 14.28.1 and lavalink-client
+  2.11.2. ([#37])
+
+### Removed
+
+- The unused `eslint` and `eslint-config-next` packages, linting runs on
+  oxlint only. ([#39])
+
 ## [1.5.0] - 2026-11-19
 
 ### Added
@@ -181,7 +208,8 @@ and this project adheres to
   Instant Gaming prices, the music player with Lavalink and the slash
   commands `/ping` and `/link`.
 
-[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.1...v1.4.2
@@ -214,3 +242,9 @@ and this project adheres to
 [#30]: https://github.com/justintischendorf/Bonsai-Bot/pull/30
 [#31]: https://github.com/justintischendorf/Bonsai-Bot/pull/31
 [#33]: https://github.com/justintischendorf/Bonsai-Bot/pull/33
+[#36]: https://github.com/justintischendorf/Bonsai-Bot/pull/36
+[#37]: https://github.com/justintischendorf/Bonsai-Bot/pull/37
+[#39]: https://github.com/justintischendorf/Bonsai-Bot/pull/39
+[#40]: https://github.com/justintischendorf/Bonsai-Bot/pull/40
+[#41]: https://github.com/justintischendorf/Bonsai-Bot/pull/41
+[#42]: https://github.com/justintischendorf/Bonsai-Bot/pull/42

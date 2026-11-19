@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Ghost } from "ghostlyjs";
 import { Pause, Play, SkipForward } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,7 +19,11 @@ const buttonStyles =
 
 export default function BonsaiFMPlayer({ className }: { className?: string }) {
   const queryClient = useQueryClient();
-  const { data: musicResponse, dataUpdatedAt } = useMusicQueue();
+  const {
+    data: musicResponse,
+    dataUpdatedAt,
+    isLoading: isMusicQueueLoading,
+  } = useMusicQueue();
   const playback = musicResponse?.data?.server;
   const song = playback?.current ?? null;
   const isConnected = playback?.connected ?? false;
@@ -104,85 +109,87 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
   }
 
   return (
-    <section
-      className={cn(
-        "flex min-w-0 flex-1 flex-col gap-4 self-start rounded-xl border border-accent p-4 max-sm:w-full sm:gap-6 sm:rounded-none sm:border-0 sm:p-0",
-        className,
-      )}
-    >
-      <SongCover
-        artworkUrl={song?.artworkUrl}
-        label={song ? `Cover von ${song.title}` : "Kein Song aktiv"}
-        sizes="(min-width: 1024px) 288px, (min-width: 640px) 224px, 128px"
-        loading="eager"
-        className="size-32 self-center rounded-lg bg-linear-to-br from-bonsai-leaf to-bonsai-face sm:size-56 lg:size-72"
-        iconClassName="size-10 text-bonsai-pot-light"
-      />
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <div className="min-w-0 text-center">
-          <p className="text-xs text-muted-foreground">{getStatusText()}</p>
-          <h2 className="truncate text-xl font-semibold lg:text-3xl">
-            {song?.title ?? "Kein Song"}
-          </h2>
-          <p className="truncate text-sm font-medium text-muted-foreground">
-            {song?.artist ?? "Füge Songs zur Warteschlange hinzu"}
-          </p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <Progress
-            aria-label="Songfortschritt"
-            // Ohne feste Sprache formatieren Server und Browser den Wert unterschiedlich ("0%" und "0 %").
-            locale="de-DE"
-            value={
-              song && song.duration > 0 ? (elapsed / song.duration) * 100 : 0
-            }
-            className="**:data-[slot=progress-indicator]:bg-bonsai-leaf-light"
-          />
-          <div className="flex justify-between text-xs font-medium text-muted-foreground tabular-nums">
-            <span>{formatDuration(elapsed)}</span>
-            <span>{formatDuration(song?.duration ?? 0)}</span>
+    <Ghost name="bonsai-fm-player" isLoading={isMusicQueueLoading}>
+      <section
+        className={cn(
+          "flex min-w-0 flex-1 flex-col gap-4 self-start rounded-xl border border-accent p-4 max-sm:w-full sm:gap-6 sm:rounded-none sm:border-0 sm:p-0",
+          className,
+        )}
+      >
+        <SongCover
+          artworkUrl={song?.artworkUrl}
+          label={song ? `Cover von ${song.title}` : "Kein Song aktiv"}
+          sizes="(min-width: 1024px) 288px, (min-width: 640px) 224px, 128px"
+          loading="eager"
+          className="size-32 self-center rounded-lg bg-linear-to-br from-bonsai-leaf to-bonsai-face sm:size-56 lg:size-72"
+          iconClassName="size-10 text-bonsai-pot-light"
+        />
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="min-w-0 text-center">
+            <p className="text-xs text-muted-foreground">{getStatusText()}</p>
+            <h2 className="truncate text-xl font-semibold lg:text-3xl">
+              {song?.title ?? "Kein Song"}
+            </h2>
+            <p className="truncate text-sm font-medium text-muted-foreground">
+              {song?.artist ?? "Füge Songs zur Warteschlange hinzu"}
+            </p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Progress
+              aria-label="Songfortschritt"
+              // Ohne feste Sprache formatieren Server und Browser den Wert unterschiedlich ("0%" und "0 %").
+              locale="de-DE"
+              value={
+                song && song.duration > 0 ? (elapsed / song.duration) * 100 : 0
+              }
+              className="**:data-[slot=progress-indicator]:bg-bonsai-leaf-light"
+            />
+            <div className="flex justify-between text-xs font-medium text-muted-foreground tabular-nums">
+              <span>{formatDuration(elapsed)}</span>
+              <span>{formatDuration(song?.duration ?? 0)}</span>
+            </div>
+          </div>
+          <div className="flex justify-center gap-2">
+            <Button
+              className={buttonStyles}
+              variant="outline"
+              type="button"
+              disabled={isTogglingPlayback || !isConnected}
+              onClick={handleTogglePlayback}
+            >
+              {isTogglingPlayback ? (
+                <LoadingSpinner />
+              ) : isPlaying ? (
+                <>
+                  <Pause />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <Play />
+                  Abspielen
+                </>
+              )}
+            </Button>
+            <Button
+              className={buttonStyles}
+              variant="outline"
+              type="button"
+              disabled={isSkippingSong || !song}
+              onClick={handleSkipSong}
+            >
+              {isSkippingSong ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <SkipForward />
+                  Überspringen
+                </>
+              )}
+            </Button>
           </div>
         </div>
-        <div className="flex justify-center gap-2">
-          <Button
-            className={buttonStyles}
-            variant="outline"
-            type="button"
-            disabled={isTogglingPlayback || !isConnected}
-            onClick={handleTogglePlayback}
-          >
-            {isTogglingPlayback ? (
-              <LoadingSpinner />
-            ) : isPlaying ? (
-              <>
-                <Pause />
-                Pause
-              </>
-            ) : (
-              <>
-                <Play />
-                Abspielen
-              </>
-            )}
-          </Button>
-          <Button
-            className={buttonStyles}
-            variant="outline"
-            type="button"
-            disabled={isSkippingSong || !song}
-            onClick={handleSkipSong}
-          >
-            {isSkippingSong ? (
-              <LoadingSpinner />
-            ) : (
-              <>
-                <SkipForward />
-                Überspringen
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-    </section>
+      </section>
+    </Ghost>
   );
 }

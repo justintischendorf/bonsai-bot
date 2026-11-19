@@ -1,5 +1,5 @@
 # Build-Kontext ist das Repo-Root: docker build -f apps/bot/Dockerfile .
-FROM oven/bun:1.4.2-slim AS base
+FROM oven/bun:1.4.4-slim AS base
 WORKDIR /app
 
 # Alle Manifeste sind nötig, damit das Lockfile zum Workspace passt.
