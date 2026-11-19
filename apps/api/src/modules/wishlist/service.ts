@@ -45,25 +45,6 @@ export abstract class WishlistService {
     }));
   }
 
-  // --------------------------------------------------------------------------> GET api/wishlist/suggestion
-  //                                                                             - returns a daily suggested game
-  static async getWishlistSuggestion() {
-    logger.info("Fetching wishlist suggestion from database");
-
-    // Only released games are suggested, unreleased ones have a release date set
-    const where = { releaseDate: null };
-
-    const count = await prisma.wishlist.count({ where });
-    if (count === 0) return null;
-
-    const suggestion = await prisma.wishlist.findFirst({
-      where,
-      orderBy: { id: "asc" },
-      skip: getDailyIndex(count, getCurrentDay()),
-    });
-    return suggestion && formatPrices(suggestion);
-  }
-
   // --------------------------------------------------------------------------> POST api/wishlist
   //                                                                             - add a game to wishlist
   static async addWishlistItem({
@@ -342,45 +323,12 @@ function formatPrices(item: WishlistItem) {
   };
 }
 
-// Get the current day number in German time, so the suggestion changes at local midnight
+// Get the current day number in German time
 function getCurrentDay() {
   const date = new Date().toLocaleDateString("en-CA", {
     timeZone: "Europe/Berlin",
   });
   return Date.parse(date) / 86_400_000;
-}
-
-// Shuffle the indexes 0..count-1, the same seed always gives the same order
-function shuffleIndexes(count: number, seed: number) {
-  let state = seed;
-  const random = () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-
-  const order = Array.from({ length: count }, (_, index) => index);
-  for (let i = count - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [order[i], order[j]] = [order[j]!, order[i]!];
-  }
-  return order;
-}
-
-// Pick the index for a day: every game once per cycle, in a new random order each cycle
-function getDailyIndex(count: number, day: number) {
-  if (count <= 2) return day % count;
-
-  const cycle = Math.floor(day / count);
-  const order = shuffleIndexes(count, cycle);
-
-  // Avoid the same game twice in a row where two cycles meet
-  if (order[0] === shuffleIndexes(count, cycle - 1)[count - 1]) {
-    [order[0], order[1]] = [order[1]!, order[0]!];
-  }
-
-  return order[day % count]!;
 }
 
 // Fetch the page and load it into Cheerio

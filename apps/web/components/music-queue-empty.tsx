@@ -7,6 +7,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { ICON_TILE } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 export default function MusicQueueEmpty() {
   return (
@@ -14,7 +16,10 @@ export default function MusicQueueEmpty() {
       <EmptyHeader className="max-w-md">
         <EmptyMedia
           variant="icon"
-          className="size-14 rounded-xl text-bonsai-leaf-light"
+          className={cn(
+            ICON_TILE,
+            "size-14 rounded-2xl text-bonsai-leaf-light",
+          )}
         >
           <ListMusic className="size-6" />
         </EmptyMedia>

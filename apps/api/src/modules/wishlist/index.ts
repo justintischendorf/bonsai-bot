@@ -18,16 +18,6 @@ export const wishlist = new Elysia({ prefix: "/wishlist" })
     };
   })
 
-  // --------------------------------------------------------------------------> GET api/wishlist/suggestion
-  //                                                                             - returns a daily suggested game
-  .get("/suggestion", async ({ set }) => {
-    set.status = 200;
-    return {
-      success: true,
-      server: await WishlistService.getWishlistSuggestion(),
-    };
-  })
-
   // --------------------------------------------------------------------------> POST api/wishlist
   //                                                                             - add a game to wishlist
   .post(

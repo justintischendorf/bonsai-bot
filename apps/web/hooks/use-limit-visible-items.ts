@@ -1,10 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
 
-/**
- * Caps a wrapping list at the height of its first `maxVisible` items, so the rest
- * is reached by scrolling. CSS alone can't do this: the height depends on how many
- * columns currently fit. The list needs an overflow style of its own.
- */
 export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -13,11 +8,11 @@ export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
     if (!list) return;
 
     const limitHeight = () => {
-      // A hidden list has no layout to measure; showing it triggers the observer.
       if (list.clientWidth === 0) return;
 
-      const lastVisible = list.children[maxVisible - 1];
-      if (!lastVisible || list.children.length <= maxVisible) {
+      const items = getItems(list);
+      const lastVisible = items[maxVisible - 1];
+      if (!lastVisible || items.length <= maxVisible) {
         list.style.maxHeight = "";
         return;
       }
@@ -29,8 +24,6 @@ export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
 
     limitHeight();
 
-    // Deferred to a frame: resizing the observed list inside the callback would
-    // raise a "ResizeObserver loop" error.
     let frame = 0;
     const observer = new ResizeObserver(() => {
       cancelAnimationFrame(frame);
@@ -45,4 +38,10 @@ export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
   }, [maxVisible, itemCount]);
 
   return listRef;
+}
+
+function getItems(element: Element): Element[] {
+  return Array.from(element.children).flatMap((child) =>
+    getComputedStyle(child).display === "contents" ? getItems(child) : [child],
+  );
 }

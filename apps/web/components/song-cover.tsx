@@ -19,7 +19,6 @@ export default function SongCover({
   className?: string;
   iconClassName?: string;
 }) {
-  // Merkt sich die URL statt eines Flags, damit der nächste Song wieder ein Bild zeigen kann.
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
 
   return (

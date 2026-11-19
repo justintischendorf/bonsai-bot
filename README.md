@@ -15,9 +15,9 @@ Lavalink, SQLite through Prisma and Better Auth for the Discord login.
 ## Features
 
 - **Discord login:** only members of the configured server can sign in.
-- **Dashboard:** server info, the member list, a daily game suggestion
-  from the released games on the wishlist and cards for the song playing in
-  Bonsai FM and the video playing in Bonsai Watch.
+- **Dashboard:** server info, how many members are online or in a game,
+  the member list, cards for the song playing in Bonsai FM and the video
+  playing in Bonsai Watch, and links to all pages with their status.
 - **Wishlist:** add games by a link to Steam, Instant Gaming or the
   PlayStation Store and mark whether crossplay is available. Title image and
   prices are fetched automatically and refreshed every 30 minutes, price
@@ -120,7 +120,7 @@ cd apps/bot && bun run deploy
 ### Loading skeletons
 
 The loading skeletons come from [GhostlyJs](https://github.com/justintischendorf/ghostlyjs).
-Every part of the dashboard that waits for data is wrapped in a `<Ghost>`,
+Every part of the website that waits for data is wrapped in a `<Ghost>`,
 its shape at every window width is stored in `apps/web/ghostly.json`. After
 changing the layout of such a part, measure again while `bun run dev` is
 running, with the session cookie from the browser (DevTools → Application →
@@ -131,9 +131,9 @@ cd apps/web && bunx ghostly measure http://localhost:3000/dashboard --cookie "be
 ```
 
 Each run rebuilds `ghostly.json` from what is on the screen. A ghost that
-is not visible at that moment is removed, e.g. "Now playing" when no song is
-playing, so make sure there is data for the parts you measure, or keep the
-old entries for the others.
+is not visible at that moment is removed, e.g. the queue of Bonsai FM when
+it is empty, so make sure there is data for the parts you measure, or keep
+the old entries for the others.
 
 ### Changing the schema
 

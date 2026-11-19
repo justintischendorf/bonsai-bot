@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { watchQueueQueryKey } from "@/hooks/use-watch-queue";
 import { apiClient } from "@/lib/api-client";
+import { PRIMARY_BUTTON } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
@@ -64,9 +65,10 @@ export function WatchVideoForm({ className }: { className?: string }) {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        className="rounded-full border-white/10 bg-white/5 px-4 dark:bg-white/5"
       />
       <Button
-        className="shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30"
+        className={cn(PRIMARY_BUTTON, "shrink-0")}
         variant="outline"
         type="submit"
         disabled={isAddingVideo}

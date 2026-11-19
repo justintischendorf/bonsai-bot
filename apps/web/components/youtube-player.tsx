@@ -14,7 +14,6 @@ declare global {
 
 let apiPromise: Promise<void> | null = null;
 
-// Right after a video change the player has no video data yet and returns undefined.
 export function getPlayerVideoId(player: YT.Player): string | null {
   return player.getVideoData?.()?.video_id ?? null;
 }
@@ -67,7 +66,6 @@ export default function YouTubePlayer({
         videoId: initialVideoId,
         width: "100%",
         height: "100%",
-        // The origin tells YouTube which site embeds the player.
         playerVars: { rel: 0, playsinline: 1, origin: window.location.origin },
         events: {
           onReady: () => {

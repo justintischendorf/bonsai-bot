@@ -1,8 +1,5 @@
 import type { SVGProps } from "react";
 
-// Shop logos in a single color (currentColor), so they follow the text color of the link next to them.
-// Steam and PlayStation are from Simple Icons, the Instant Gaming mark is from their own logo.
-
 type LogoProps = SVGProps<SVGSVGElement>;
 
 export function SteamLogo(props: LogoProps) {
