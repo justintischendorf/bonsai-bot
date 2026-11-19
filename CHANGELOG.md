@@ -23,8 +23,8 @@ and this project adheres to
 
 ### Changed
 
-- The README is now in English, with an architecture diagram and a table of
-  all environment variables. ([#29])
+- The README is now in English, with a table of all environment variables.
+  ([#29], [#33])
 - CI no longer runs on pushes to `main` and `develop`, only on pull
   requests. ([#27])
 
@@ -210,3 +210,4 @@ and this project adheres to
 [#29]: https://github.com/justintischendorf/Bonsai-Bot/pull/29
 [#30]: https://github.com/justintischendorf/Bonsai-Bot/pull/30
 [#31]: https://github.com/justintischendorf/Bonsai-Bot/pull/31
+[#33]: https://github.com/justintischendorf/Bonsai-Bot/pull/33
