@@ -66,7 +66,7 @@ export function WatchVideoForm({ className }: { className?: string }) {
         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       />
       <Button
-        className="shrink-0 transition-colors duration-300 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30"
+        className="shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30"
         variant="outline"
         type="submit"
         disabled={isAddingVideo}

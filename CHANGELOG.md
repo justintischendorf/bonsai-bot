@@ -31,6 +31,10 @@ and this project adheres to
 
 ### Removed
 
+- All animations in the dashboard: the intro and fade-in animations of the
+  pages, the blinking eyes of the logo, hover effects and the open and close
+  animations of dialogs, popovers and menus. Only the Bonsai Bot heading on
+  the dashboard still floats up and down. ([#31])
 - `prettier` has been removed, formatting runs on oxfmt only. `oxfmt` and
   `oxlint` are now dev dependencies. ([#26])
 
@@ -206,3 +210,4 @@ and this project adheres to
 [#28]: https://github.com/justintischendorf/Bonsai-Bot/pull/28
 [#29]: https://github.com/justintischendorf/Bonsai-Bot/pull/29
 [#30]: https://github.com/justintischendorf/Bonsai-Bot/pull/30
+[#31]: https://github.com/justintischendorf/Bonsai-Bot/pull/31

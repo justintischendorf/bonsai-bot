@@ -74,7 +74,6 @@ function SortableVideo({
     setNodeRef,
     setActivatorNodeRef,
     transform,
-    transition,
     isDragging,
   } = useSortable({
     id: video.id,
@@ -84,9 +83,9 @@ function SortableVideo({
   return (
     <article
       ref={setNodeRef}
-      style={{ transform: CSS.Translate.toString(transform), transition }}
+      style={{ transform: CSS.Translate.toString(transform) }}
       className={cn(
-        "stagger flex shrink-0 items-center gap-2 rounded-xl border border-accent bg-background p-2 sm:gap-3 sm:p-3",
+        "flex shrink-0 items-center gap-2 rounded-xl border border-accent bg-background p-2 sm:gap-3 sm:p-3",
         isDragging && "relative z-10 border-bonsai-leaf-light shadow-lg",
       )}
     >
