@@ -19,8 +19,7 @@ and this project adheres to
 - Every Monday, Dependabot opens PRs to `develop` for Bun packages, GitHub
   Actions, the Dockerfile base images and the images in the compose files.
   ([#28])
-- `CHANGELOG.md` and `CONTRIBUTING.md` with the rules for branches, commits,
-  pull requests, CI and releases. ([#30])
+- `CHANGELOG.md` with all changes since v1.0.0. ([#30])
 
 ### Changed
 
