@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-19
+
 ### Added
 
 - On every pull request to `develop` and `main`, CI now also builds all apps
@@ -179,7 +181,8 @@ and this project adheres to
   Instant Gaming prices, the music player with Lavalink and the slash
   commands `/ping` and `/link`.
 
-[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.3...develop
+[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.0...v1.4.1
