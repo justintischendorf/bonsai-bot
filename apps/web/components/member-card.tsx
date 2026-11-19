@@ -2,7 +2,6 @@ import { type Member } from "@/hooks/use-discord-member-info";
 import { cn } from "@/lib/utils";
 
 import { MemberAvatar } from "./member-avatar";
-import { Skeleton } from "./ui/skeleton";
 
 export default function MemberCard({
   member,
@@ -49,18 +48,5 @@ export default function MemberCard({
         </p>
       </div>
     </article>
-  );
-}
-
-export function MemberCardSkeleton() {
-  return (
-    <div className="flex w-full items-center gap-3 rounded-xl p-3">
-      <Skeleton className="size-10 shrink-0 rounded-full" />
-      <div className="flex flex-1 flex-col gap-2">
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-3 w-1/2" />
-        <Skeleton className="h-3 w-3/4" />
-      </div>
-    </div>
   );
 }
