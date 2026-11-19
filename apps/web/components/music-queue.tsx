@@ -152,7 +152,6 @@ function SortableSong({
 export default function MusicQueue() {
   const { data: musicQueueResponse, isLoading: isMusicQueueLoading } =
     useMusicQueue();
-  // Hält die Liste beim Ziehen fest, damit die Abfrage alle paar Sekunden sie nicht unter dem Zeiger umsortiert.
   const [songsWhileDragging, setSongsWhileDragging] = useState<
     QueuedSong[] | null
   >(null);
@@ -197,7 +196,6 @@ export default function MusicQueue() {
         });
       }
     },
-    // Lädt auch nach einem Fehler neu und setzt die Liste so auf den echten Stand zurück.
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: musicQueueQueryKey }),
   });
@@ -213,7 +211,6 @@ export default function MusicQueue() {
       newIndex,
     );
 
-    // Direkt setzen statt in onMutate: Das läuft erst später, die Liste würde sonst kurz zurückspringen.
     void queryClient.cancelQueries({ queryKey: musicQueueQueryKey });
     queryClient.setQueryData<MusicQueueResponse>(musicQueueQueryKey, (old) =>
       old?.data

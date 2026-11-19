@@ -6,7 +6,6 @@ export namespace MusicModel {
     url: t.Optional(t.String({ maxLength: 2000 })),
   });
 
-  // Der Song landet vor beforeId, bei null am Ende der Warteschlange.
   export const MoveSong = t.Object({
     beforeId: t.Nullable(t.Integer()),
   });

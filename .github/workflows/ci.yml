@@ -12,14 +12,11 @@ permissions:
   contents: read
 
 jobs:
-  # Keep the job id "ci", it is meant to be the required status check
-  # for main and develop.
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     env:
-      # Only needed for prisma generate, no database is created
       DATABASE_URL: file:./data/ci.db
 
     steps:
@@ -49,7 +46,6 @@ jobs:
         run: bun run check-types
 
       - name: Build
-        # apps/web/lib/auth-client.ts throws without them while prerendering
         env:
           NEXT_PUBLIC_API_SERVER_URL: http://localhost:3001
           NEXT_PUBLIC_AUTH_BASE_URL: http://localhost:3001

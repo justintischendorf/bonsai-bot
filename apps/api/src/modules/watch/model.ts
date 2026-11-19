@@ -7,7 +7,6 @@ export namespace WatchModel {
 
   export const SetPlayback = t.Object({
     position: t.Number({ minimum: 0 }),
-    // When the client read the position, on the synced server clock.
     serverTime: t.Optional(t.Number()),
   });
 

@@ -1,4 +1,3 @@
-# Abhängigkeiten und Build-Ausgaben werden im Image neu erzeugt
 **/node_modules
 **/.turbo
 **/.next
@@ -8,7 +7,6 @@
 **/*.tsbuildinfo
 packages/database/generated
 
-# Secrets und lokale Daten dürfen nie ins Image
 **/.env
 **/.env.*
 **/*.pem
@@ -17,7 +15,6 @@ packages/database/generated
 **/*.db-shm
 **/*.db-wal
 
-# Nicht für den Build nötig
 .git
 .github
 .vscode

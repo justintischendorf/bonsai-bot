@@ -27,28 +27,16 @@ import { toast } from "./ui/toast";
 import YouTubePlayer, { getPlayerVideoId } from "./youtube-player";
 
 const TICK_MS = 250;
-// Offset that gets corrected when the video is paused, seeking a paused video is invisible.
 const PAUSED_SYNC_TOLERANCE_S = 0.1;
-// Offset that gets corrected right away when someone else started or moved the playback.
 const PLAY_SYNC_TOLERANCE_S = 0.25;
-// Offset that gets corrected while everyone just keeps watching.
 const DRIFT_TOLERANCE_S = 0.2;
 const DRIFT_COOLDOWN_MS = 3_000;
-// The player has to play this long before its time is trusted, it lags right after starting or seeking.
 const SETTLE_MS = 1_500;
-// Seeking a playing video or resuming a paused one needs a moment to buffer, the player lands behind
-// the target by about that much. That lead gets learned from how far behind each correction ended up.
 const MAX_LEAD_S = 1;
-// Jump in the player time that playback alone can't explain, so the user seeked.
 const SEEK_DETECTION_S = 1.5;
-// A jump this close to the shared position is our own correction, not a user seek.
 const USER_SEEK_MIN_OFFSET_S = 1;
-// Player events right after our own commands are not user input.
 const OWN_COMMAND_GRACE_MS = 1_000;
-// How long the shared video may play without the local player starting before a hint shows.
 const STUCK_HINT_MS = 8_000;
-// The video is removed or private. YouTube's bot check reports 150 like a video that
-// doesn't allow embedding, so those two can't be told apart and both count as "blocked".
 const VIDEO_NOT_FOUND_ERROR = 100;
 
 type PlaybackAction = "play" | "pause" | "seek";
@@ -59,19 +47,14 @@ type Remote = {
   paused: boolean;
   position: number;
   version: number;
-  // When the position was taken, on the server clock (null until the clock is synced)…
   serverTime: number | null;
-  // …and on the local clock as a fallback.
   receivedAt: number;
 };
 
 type Sample = { time: number; at: number; playing: boolean };
 
-// "seek": jumping inside a playing video, "resume": starting a paused one, they buffer differently long.
 type LeadKind = "seek" | "resume";
 
-// "blocked": YouTube refuses this viewer (bot check) or the embed, "unavailable": the video is gone,
-// "stuck": the shared video plays but the local player doesn't start for an unknown reason.
 type PlaybackIssue = "blocked" | "unavailable" | "stuck";
 
 const buttonStyles =
@@ -83,7 +66,6 @@ const ERROR_TITLES: Record<PlaybackAction, string> = {
   seek: "Fehler beim Springen im Video",
 };
 
-// The server clock includes the network delay of the message, the local clock doesn't.
 function getElapsedMs(remote: Remote) {
   const serverNow = getServerNow();
   if (serverNow !== null && remote.serverTime !== null) {
@@ -150,7 +132,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     measuringLead.current = kind;
   }
 
-  // Seeks a playing video a bit ahead, so it is in sync once it buffered.
   function seekWhilePlaying(player: YT.Player, target: Remote) {
     startCorrection("seek");
     command(() =>
@@ -158,7 +139,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     );
   }
 
-  // Starts a paused video a bit ahead, so it is in sync once it buffered.
   function resume(player: YT.Player, target: Remote) {
     startCorrection("resume");
     command(() => {
@@ -167,7 +147,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     });
   }
 
-  // Learns how far behind the last correction landed and adds that to the next one.
   function updateLead(time: number, expected: number) {
     const kind = measuringLead.current;
     if (!kind) return;
@@ -179,7 +158,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     );
   }
 
-  // Brings the local player to the shared state after it changed or the player became ready.
   function applyRemote() {
     const synced = getSyncedPlayer();
     if (!synced) return;
@@ -190,7 +168,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     const offset = Math.abs(player.getCurrentTime() - expected);
 
     if (target.paused) {
-      // Seeking a cued video would start it, it gets positioned on the first play instead.
       if (
         playerState === YT.PlayerState.UNSTARTED ||
         playerState === YT.PlayerState.CUED
@@ -198,7 +175,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
         return;
       }
       if (isPlayingState(playerState)) command(() => player.pauseVideo());
-      // Everyone stops on the same frame, so they also continue from the same one.
       if (offset > PAUSED_SYNC_TOLERANCE_S) {
         command(() => player.seekTo(expected, true));
       }
@@ -210,7 +186,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
       return;
     }
     if (!isPlayingState(playerState)) {
-      // A fresh player loads first, the drift correction lines it up once it plays.
       if (offset > PLAY_SYNC_TOLERANCE_S) {
         command(() => player.seekTo(expected, true));
       }
@@ -241,7 +216,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
       serverTime: state.serverTime,
       receivedAt: Date.now(),
     };
-    // A measurement from before this change would compare against the wrong target.
     measuringLead.current = null;
     applyRemote();
   }, [state]);
@@ -280,9 +254,7 @@ export default function WatchPlayer({ className }: { className?: string }) {
         : old,
     );
 
-    // Sent one after another so the server sees them in the order they happened.
     requestChain.current = requestChain.current.then(async () => {
-      // The server advances the position by the time the request took.
       const { data, error } = await apiClient.api.watch[action].post({
         position,
         ...(serverTime !== null && { serverTime }),
@@ -295,14 +267,11 @@ export default function WatchPlayer({ className }: { className?: string }) {
         title: ERROR_TITLES[action],
         description: (error?.value as { message: string } | undefined)?.message,
       });
-      // Let the next server state replace the optimistic one.
       if (remote.current) remote.current.version = -Infinity;
       await queryClient.invalidateQueries({ queryKey: watchQueueQueryKey });
     });
   }
 
-  // Shows a hint when the shared video plays but the local player doesn't, e.g. because
-  // YouTube shows its "Sign in to confirm you're not a bot" screen instead of the video.
   function detectStuckPlayer() {
     const target = remote.current;
     const player = playerRef.current;
@@ -310,7 +279,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
 
     if (!target?.videoId || target.paused || isPlaying) {
       stuckSince.current = null;
-      // Once the video plays, any earlier problem is solved.
       if (issue === "stuck" || (isPlaying && issue)) setIssue(null);
       return;
     }
@@ -320,7 +288,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     }
   }
 
-  // Seeks don't reliably fire player events, so the player time gets watched for jumps.
   function tick() {
     detectStuckPlayer();
     const synced = getSyncedPlayer();
@@ -356,7 +323,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
       }
     }
 
-    // Catches play/pause changes whose event fell into a grace period.
     if (playerState === YT.PlayerState.PAUSED && !target.paused) {
       if (hasPlayed.current) sendPlayback("pause", time);
       return;
@@ -404,7 +370,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     await queryClient.invalidateQueries({ queryKey: watchQueueQueryKey });
   }
 
-  // A fresh player starts at 0, its first play continues at the shared position instead.
   function handleLocalPlay(time: number) {
     const synced = getSyncedPlayer();
     if (!synced) return;
@@ -425,7 +390,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
     setIssue(code === VIDEO_NOT_FOUND_ERROR ? "unavailable" : "blocked");
   }
 
-  // A new player picks up a YouTube login that happened in another tab.
   function handleRetry() {
     hasPlayed.current = false;
     sample.current = null;
@@ -545,7 +509,6 @@ export default function WatchPlayer({ className }: { className?: string }) {
   );
 }
 
-// The YouTube login only reaches the embedded player when the browser allows third-party cookies.
 const COOKIE_STEPS = [
   {
     browser: "Chrome",

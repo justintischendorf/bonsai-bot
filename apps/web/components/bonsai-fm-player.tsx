@@ -29,7 +29,6 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
   const isConnected = playback?.connected ?? false;
   const isPlaying = Boolean(song) && !playback?.paused;
 
-  // Meldet nur neue Fehler, nicht den Stand, der beim Öffnen der Seite schon vorlag.
   const lastFailure = playback?.lastFailure;
   const seenFailureAt = useRef<number | null | undefined>(undefined);
   useEffect(() => {
@@ -48,7 +47,6 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
     seenFailureAt.current = failureAt;
   }, [playback, lastFailure]);
 
-  // Zwischen zwei Abfragen läuft die Anzeige lokal weiter, damit der Fortschritt nicht springt.
   const [now, setNow] = useState(0);
   useEffect(() => {
     if (!isPlaying) return;
@@ -137,7 +135,6 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
           <div className="flex flex-col gap-1">
             <Progress
               aria-label="Songfortschritt"
-              // Ohne feste Sprache formatieren Server und Browser den Wert unterschiedlich ("0%" und "0 %").
               locale="de-DE"
               value={
                 song && song.duration > 0 ? (elapsed / song.duration) * 100 : 0

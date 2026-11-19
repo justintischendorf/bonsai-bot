@@ -19,7 +19,6 @@ const YOUTUBE_HOSTS = new Set([
 ]);
 const YOUTUBE_PATH_PREFIXES = new Set(["shorts", "live", "embed"]);
 const YOUTUBE_VIDEO_ID = /^[\w-]{11}$/;
-// Muss zu images.remotePatterns der Website passen: next/image wirft bei anderen Hosts einen Fehler.
 const ARTWORK_URL_PREFIX = "https://i.ytimg.com/";
 const QUEUE_ORDER = [{ position: "asc" }, { id: "asc" }] as const;
 const SUGGESTION_REQUESTER = "Bonsai Bot";
@@ -34,7 +33,6 @@ export class MusicError extends Error {
   }
 }
 
-// Reduziert jeden Link auf das einzelne Video: Links mit "list=" würden sonst eine ganze Playlist laden.
 export function toYoutubeVideoUrl(input: string) {
   let url: URL;
   try {
@@ -76,11 +74,8 @@ function toCanonicalUrl(url: string) {
 
 export class MusicPlayer {
   private readonly manager: LavalinkManager;
-  // Der laufende Song ist schon aus der Datenbank entfernt und liegt nur hier.
   private current: MusicQueueModel | null = null;
-  // Sorgt dafür, dass nach "Abspielen" neue Songs automatisch starten, bis pausiert wird.
   private autoplay = false;
-  // Damit die Website melden kann, wenn ein Song nicht abspielbar war und übersprungen wurde.
   private lastFailure: { title: string; at: number } | null = null;
   private lastAction: Promise<unknown> = Promise.resolve();
   private playedUrls: string[] = [];
@@ -93,20 +88,16 @@ export class MusicPlayer {
           host: config.lavalinkHost,
           port: config.lavalinkPort,
           authorization: required("LAVALINK_PASSWORD"),
-          // Lavalink startet langsamer als der Bot und darf auch später neu starten.
           retryAmount: 100_000,
           retryDelay: 5_000,
-          // Sonst ruft die Bibliothek ws.close(500) auf, was unter Bun eine Exception wirft.
           closeOnError: false,
         },
       ],
       sendToShard: (guildId, payload) =>
         this.client.guilds.cache.get(guildId)?.shard.send(payload),
-      // Die Warteschlange liegt in der Datenbank, die Queue der Bibliothek bleibt immer leer.
       autoSkip: false,
       playerOptions: {
         onDisconnect: { destroyPlayer: true },
-        // Defekte Songs werden einzeln übersprungen, statt die ganze Jam zu beenden.
         maxErrorsPerTime: { threshold: 0, maxAmount: 0 },
       },
     });
@@ -115,7 +106,6 @@ export class MusicPlayer {
       .on("connect", () => console.log("Lavalink verbunden"))
       .on("disconnect", (_node, reason) => {
         console.warn("Lavalink getrennt:", reason);
-        // Ein Neustart von Lavalink verwirft den Player, ohne Ton zu spielen wäre die Jam nur noch Schein.
         void this.exclusive(() => this.abortJam()).catch((error) =>
           console.error("Jam konnte nicht beendet werden:", error),
         );
@@ -145,7 +135,6 @@ export class MusicPlayer {
       )
       .on("playerDestroy", (_player, reason) => {
         if (reason === JOIN_FAILED) return;
-        // Auch wenn jemand den Bot aus dem Channel wirft, ist die Jam vorbei.
         void this.exclusive(() => this.endJam()).catch((error) =>
           console.error("Warteschlange konnte nicht geleert werden:", error),
         );
@@ -254,7 +243,6 @@ export class MusicPlayer {
       const player = this.requirePlayer();
       if (!this.current) throw new MusicError("NOTHING_PLAYING", 409);
 
-      // Beendet den Song. Das folgende "queueEnd" startet den nächsten, auch wenn vorher pausiert war.
       this.autoplay = true;
       await player.stopPlaying(false, false);
     });
@@ -329,7 +317,6 @@ export class MusicPlayer {
     });
   }
 
-  // Ohne beforeId rutscht der Song ans Ende der Warteschlange.
   async moveSong(id: number, beforeId: number | null) {
     await this.exclusive(async () => {
       const queue = await prisma.musicQueue.findMany({
@@ -423,7 +410,6 @@ export class MusicPlayer {
   }
 
   private async playSong(player: Player, song: MusicQueueModel) {
-    // Vor dem Start setzen: Ein Fehler kann noch während play() gemeldet werden und braucht den Titel.
     this.current = song;
     this.rememberPlayed(song.url);
     try {
@@ -479,7 +465,6 @@ export class MusicPlayer {
     }
   }
 
-  // Bewegt sich immer nur eine Aktion gleichzeitig durch Player und Warteschlange.
   private exclusive<T>(action: () => Promise<T>): Promise<T> {
     const result = this.lastAction.then(action, action);
     this.lastAction = result.catch(() => undefined);
