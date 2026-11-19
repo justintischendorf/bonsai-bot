@@ -22,7 +22,7 @@ import { useWatchLive, useWatchQueue } from "@/hooks/use-watch-queue";
 
 gsap.registerPlugin(useGSAP);
 
-const MAX_VISIBLE_MEMBERS = 12;
+const MAX_VISIBLE_MEMBERS = 10;
 const MAX_VISIBLE_MEMBERS_MOBILE = 4;
 
 const PAGE_LINKS = [
