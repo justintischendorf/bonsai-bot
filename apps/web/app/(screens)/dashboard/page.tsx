@@ -13,14 +13,12 @@ import { BonsaiLogo } from "@/components/bonsai-logo";
 import MemberCard from "@/components/member-card";
 import NowPlaying from "@/components/now-playing";
 import NowWatching from "@/components/now-watching";
-import WishlistSuggestion from "@/components/wishlist-suggestion";
 import { useDiscordMemberInfo } from "@/hooks/use-discord-member-info";
 import { useFloatToTextBottom } from "@/hooks/use-float-to-text-bottom";
 import { useLimitVisibleItems } from "@/hooks/use-limit-visible-items";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useMusicQueue } from "@/hooks/use-music-queue";
 import { useWatchLive, useWatchQueue } from "@/hooks/use-watch-queue";
-import { useWishlistSuggestion } from "@/hooks/use-wishlist-suggestion";
 
 gsap.registerPlugin(useGSAP);
 
@@ -65,11 +63,9 @@ export default function DashboardPage() {
     serverMembers?.length ?? 0,
   );
 
-  const { data: wishlistSuggestionResponse } = useWishlistSuggestion();
   const { data: musicResponse } = useMusicQueue();
   const { data: watchResponse } = useWatchQueue();
   useWatchLive();
-  const hasSuggestion = !!wishlistSuggestionResponse?.data?.server;
   const hasSong = !!musicResponse?.data?.server?.current;
   const hasVideo = !!watchResponse?.data?.server?.current;
 
@@ -94,9 +90,8 @@ export default function DashboardPage() {
 
   return (
     <main ref={pageRef}>
-      {(hasSuggestion || hasSong || hasVideo) && (
+      {(hasSong || hasVideo) && (
         <div className="flex-col sm:flex-row flex gap-5 pb-5 px-4 sm:px-8 xl:px-20">
-          <WishlistSuggestion href="/wishlist" />
           <NowPlaying href="/bonsai-fm" />
           <NowWatching href="/bonsai-watch" />
         </div>
@@ -123,13 +118,10 @@ export default function DashboardPage() {
               auf einen Blick, was auf dem Server los ist und{" "}
               <strong>wer gerade online ist</strong>, sodass du sofort siehst,
               ob sich noch jemand für eine Runde findet. Außerdem sammelt er
-              alle <strong>Spiele, die wir zusammen spielen wollen</strong>, und
-              schlägt jeden Tag eines davon als{" "}
-              <strong>heutige Empfehlung</strong> vor. So geht keine gute Idee
-              mehr im Chat unter, und die Frage „Was zocken wir heute?“ ist
-              schnell beantwortet. Steht der nächste Spielekauf an, vergleicht
-              er die Preise auf <strong>Steam</strong>,{" "}
-              <strong>Instant Gaming</strong> und im{" "}
+              alle <strong>Spiele, die wir zusammen spielen wollen</strong>. So
+              geht keine gute Idee mehr im Chat unter. Steht der nächste
+              Spielekauf an, vergleicht er die Preise auf <strong>Steam</strong>
+              , <strong>Instant Gaming</strong> und im{" "}
               <strong>PlayStation Store</strong> und findet das{" "}
               <strong>günstigste Angebot</strong>. Wird ein Spiel deutlich
               günstiger, <strong>meldet er sich im Discord</strong>, damit am
