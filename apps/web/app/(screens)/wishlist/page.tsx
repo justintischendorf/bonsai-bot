@@ -1,11 +1,11 @@
 "use client";
 
+import { Ghost } from "ghostlyjs";
+
 import { BonsaiLogo } from "@/components/bonsai-logo";
 import { Separator } from "@/components/ui/separator";
 import { WishlistEmptyCard } from "@/components/wishlist-empty-card";
-import WishlistItemCard, {
-  WishlistItemCardSkeleton,
-} from "@/components/wishlist-item-card";
+import WishlistItemCard from "@/components/wishlist-item-card";
 import { WishlistItemDialog } from "@/components/wishlist-item-dialog";
 import { useWishlist } from "@/hooks/use-wishlist";
 
@@ -36,18 +36,15 @@ export default function Wishlist() {
       </div>
       <Separator />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {isWishlistLoading
-          ? Array.from({ length: 8 }, (_, index) => (
-              <WishlistItemCardSkeleton key={index} />
-            ))
-          : wishlistItems?.map((item, index) => (
-              <WishlistItemCard
-                key={item.id}
-                item={item}
-                // The first row (up to 4 columns) is visible right away
-                imageLoading={index < FIRST_ROW_SIZE ? "eager" : "lazy"}
-              />
-            ))}
+        <Ghost name="wishlist-items" isLoading={isWishlistLoading} count={8}>
+          {wishlistItems?.map((item, index) => (
+            <WishlistItemCard
+              key={item.id}
+              item={item}
+              imageLoading={index < FIRST_ROW_SIZE ? "eager" : "lazy"}
+            />
+          ))}
+        </Ghost>
       </div>
       {wishlistItems?.length === 0 && !isWishlistLoading && (
         <div className="flex flex-col items-center justify-center gap-4 py-20">

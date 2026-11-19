@@ -1,6 +1,7 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
+import { Ghost } from "ghostlyjs";
 import gsap from "gsap";
 import { Gamepad2, MoveRight, Radio, TvMinimalPlay } from "lucide-react";
 import Image from "next/image";
@@ -9,9 +10,8 @@ import { useRef } from "react";
 
 import bonsaiBotTitle from "@/assets/logos/bonsai-bot-title.svg";
 import { BonsaiLogo } from "@/components/bonsai-logo";
-import MemberCard, { MemberCardSkeleton } from "@/components/member-card";
+import MemberCard from "@/components/member-card";
 import NowPlaying from "@/components/now-playing";
-import { Skeleton } from "@/components/ui/skeleton";
 import WishlistSuggestion from "@/components/wishlist-suggestion";
 import { useDiscordMemberInfo } from "@/hooks/use-discord-member-info";
 import { useFloatToTextBottom } from "@/hooks/use-float-to-text-bottom";
@@ -160,26 +160,29 @@ export default function DashboardPage() {
         </nav>
         <div className="w-full flex justify-center flex-wrap px-4 gap-2 sm:px-8 lg:col-start-2 lg:row-start-1 lg:justify-end xl:px-20">
           <div className="w-full flex justify-center items-center mb-4 lg:justify-end">
-            {isDiscordServerMembersLoading ? (
-              <Skeleton className="w-42 h-8" />
-            ) : (
+            <Ghost
+              name="discord-server-member-count"
+              isLoading={isDiscordServerMembersLoading}
+            >
               <p className="text-lg font-semibold">
                 {serverMembers?.length} Mitglieder
               </p>
-            )}
+            </Ghost>
           </div>
 
           <div
             ref={memberListRef}
             className="grid w-full grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2"
           >
-            {isDiscordServerMembersLoading
-              ? Array.from({ length: 10 }, (_, index) => (
-                  <MemberCardSkeleton key={index} />
-                ))
-              : serverMembers?.map((member) => (
-                  <MemberCard member={member} key={member.id} />
-                ))}
+            <Ghost
+              name="discord-server-members"
+              isLoading={isDiscordServerMembersLoading}
+              count={MAX_VISIBLE_MEMBERS}
+            >
+              {serverMembers?.map((member) => (
+                <MemberCard member={member} key={member.id} />
+              ))}
+            </Ghost>
           </div>
         </div>
       </div>

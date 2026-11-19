@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 import { wishlistQueryKey, type WishlistItem } from "@/hooks/use-wishlist";
 import { apiClient } from "@/lib/api-client";
 import { useSession } from "@/lib/auth-client";
@@ -316,30 +315,5 @@ export default function WishlistItemCard({
         title="Spiel entfernen?"
       />
     </article>
-  );
-}
-
-export function WishlistItemCardSkeleton() {
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border border-accent p-3">
-      <Skeleton className="aspect-616/353 w-full rounded-md" />
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Skeleton className="h-7 w-2/3" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-        <Skeleton className="size-7 shrink-0" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-5 w-2/3" />
-      </div>
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-full" />
-      </div>
-    </div>
   );
 }

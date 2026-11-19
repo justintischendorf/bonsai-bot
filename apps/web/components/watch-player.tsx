@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Ghost } from "ghostlyjs";
 import {
   ExternalLink,
   RotateCw,
@@ -22,7 +23,6 @@ import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
 import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 import { toast } from "./ui/toast";
 import YouTubePlayer, { getPlayerVideoId } from "./youtube-player";
 
@@ -480,67 +480,67 @@ export default function WatchPlayer({ className }: { className?: string }) {
 
   return (
     <section className={cn("flex min-w-0 flex-col gap-4 lg:flex-2", className)}>
-      {isWatchQueueLoading ? (
-        <Skeleton className="aspect-video w-full rounded-xl" />
-      ) : current ? (
-        <YouTubePlayer
-          key={playerKey}
-          videoId={current.videoId}
-          playerRef={playerRef}
-          onReady={() => setReadyCount((count) => count + 1)}
-          onStateChange={handleStateChange}
-          onError={handlePlayerError}
-        />
-      ) : (
-        <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl bg-linear-to-br from-bonsai-leaf to-bonsai-face p-4 text-center">
-          <TvMinimalPlay className="size-10 text-bonsai-pot-light" />
-          <p className="text-sm font-medium text-bonsai-pot-light">
-            Füge ein Video hinzu, um zusammen zu schauen
-          </p>
-        </div>
-      )}
-      {current && issue && (
-        <PlaybackHint
-          issue={issue}
-          onRetry={handleRetry}
-          onOpenOnYouTube={openOnYouTube}
-        />
-      )}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-xs text-muted-foreground">
-            {current
-              ? state?.paused
-                ? "Pausiert"
-                : "Läuft gerade"
-              : "Kein Video aktiv"}
-          </p>
-          <h2 className="line-clamp-2 text-xl font-semibold lg:text-2xl">
-            {current?.title ?? "Kein Video"}
-          </h2>
-          {current && (
-            <p className="truncate text-sm font-medium text-muted-foreground">
-              {current.channel} · Gewünscht von {current.requestedBy}
+      <Ghost name="watch-player" isLoading={isWatchQueueLoading}>
+        {current ? (
+          <YouTubePlayer
+            key={playerKey}
+            videoId={current.videoId}
+            playerRef={playerRef}
+            onReady={() => setReadyCount((count) => count + 1)}
+            onStateChange={handleStateChange}
+            onError={handlePlayerError}
+          />
+        ) : (
+          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl bg-linear-to-br from-bonsai-leaf to-bonsai-face p-4 text-center">
+            <TvMinimalPlay className="size-10 text-bonsai-pot-light" />
+            <p className="text-sm font-medium text-bonsai-pot-light">
+              Füge ein Video hinzu, um zusammen zu schauen
             </p>
-          )}
+          </div>
+        )}
+        {current && issue && (
+          <PlaybackHint
+            issue={issue}
+            onRetry={handleRetry}
+            onOpenOnYouTube={openOnYouTube}
+          />
+        )}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">
+              {current
+                ? state?.paused
+                  ? "Pausiert"
+                  : "Läuft gerade"
+                : "Kein Video aktiv"}
+            </p>
+            <h2 className="line-clamp-2 text-xl font-semibold lg:text-2xl">
+              {current?.title ?? "Kein Video"}
+            </h2>
+            {current && (
+              <p className="truncate text-sm font-medium text-muted-foreground">
+                {current.channel} · Gewünscht von {current.requestedBy}
+              </p>
+            )}
+          </div>
+          <Button
+            className={cn(buttonStyles, "shrink-0")}
+            variant="outline"
+            type="button"
+            disabled={isSkippingVideo || !current}
+            onClick={() => current && handleSkipVideo(current.id)}
+          >
+            {isSkippingVideo ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <SkipForward />
+                Überspringen
+              </>
+            )}
+          </Button>
         </div>
-        <Button
-          className={cn(buttonStyles, "shrink-0")}
-          variant="outline"
-          type="button"
-          disabled={isSkippingVideo || !current}
-          onClick={() => current && handleSkipVideo(current.id)}
-        >
-          {isSkippingVideo ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <SkipForward />
-              Überspringen
-            </>
-          )}
-        </Button>
-      </div>
+      </Ghost>
     </section>
   );
 }
