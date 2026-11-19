@@ -8,6 +8,40 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-19
+
+### Added
+
+- Key figures on the dashboard: members on the server, members online with
+  their share and members in a game with the most played games. ([#47])
+- Cards on the dashboard that link to the wishlist, Bonsai FM and Bonsai
+  Watch and show their status, e.g. the number of games or the song that is
+  playing. ([#47])
+- Loading skeletons for the song and video count of the queues, the jam
+  button of Bonsai FM and the status of the dashboard cards. ([#47])
+
+### Changed
+
+- New design for the dashboard, the wishlist, Bonsai FM, Bonsai Watch, the
+  login and the dialogs for adding songs and games: dark cards with a green
+  accent, a header with an icon on every page and a banner with the logo on
+  the dashboard. On phones the dashboard is more compact. ([#47])
+- The member list on the dashboard shows 10 members, 4 on phones, and
+  scrolls for the rest. ([#45])
+- The dialogs for adding songs and games stay in place when opened and
+  focus the first field. ([#47])
+
+### Removed
+
+- The daily game suggestion on the dashboard and its route
+  `GET /api/wishlist/suggestion`. ([#45])
+
+### Fixed
+
+- Songs and videos can be removed from the queues again. Elysia is pinned
+  to 1.4.30, because 1.4.31 and 1.4.32 answer routes with number parameters
+  like `/remove-song/:id` with a 500. ([#46])
+
 ## [1.6.0] - 2026-11-19
 
 ### Added
@@ -208,7 +242,8 @@ and this project adheres to
   Instant Gaming prices, the music player with Lavalink and the slash
   commands `/ping` and `/link`.
 
-[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.2...v1.4.3
@@ -248,3 +283,6 @@ and this project adheres to
 [#40]: https://github.com/justintischendorf/Bonsai-Bot/pull/40
 [#41]: https://github.com/justintischendorf/Bonsai-Bot/pull/41
 [#42]: https://github.com/justintischendorf/Bonsai-Bot/pull/42
+[#45]: https://github.com/justintischendorf/Bonsai-Bot/pull/45
+[#46]: https://github.com/justintischendorf/Bonsai-Bot/pull/46
+[#47]: https://github.com/justintischendorf/Bonsai-Bot/pull/47
