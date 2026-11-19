@@ -216,11 +216,9 @@ Bonsai Watch is not affected.
 | `bun run docker:dev`       | Start the bot, Lavalink and yt-cipher       |
 | `bun run docker:prod`      | Build and start the production stack        |
 
-## Contributing
+## Changelog
 
-Branches, commits, pull requests, CI and releases are described in
-[CONTRIBUTING.md](CONTRIBUTING.md), all changes in
-[CHANGELOG.md](CHANGELOG.md).
+All changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 > [!CAUTION]
 > Never commit `.env` or `*.db` files, they are excluded by `.gitignore`. The
