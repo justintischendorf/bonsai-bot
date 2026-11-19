@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- The unused `eslint` and `eslint-config-next` packages, linting runs on
+  oxlint only. ([#39])
+
 ## [1.5.0] - 2026-11-19
 
 ### Added
@@ -214,3 +219,4 @@ and this project adheres to
 [#30]: https://github.com/justintischendorf/Bonsai-Bot/pull/30
 [#31]: https://github.com/justintischendorf/Bonsai-Bot/pull/31
 [#33]: https://github.com/justintischendorf/Bonsai-Bot/pull/33
+[#39]: https://github.com/justintischendorf/Bonsai-Bot/pull/39
