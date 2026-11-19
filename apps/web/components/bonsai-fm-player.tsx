@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { musicQueueQueryKey, useMusicQueue } from "@/hooks/use-music-queue";
 import { apiClient } from "@/lib/api-client";
+import { OUTLINE_BUTTON, PLACEHOLDER } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
@@ -14,8 +15,7 @@ import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 import { toast } from "./ui/toast";
 
-const buttonStyles =
-  "flex-1 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:flex-none";
+const buttonStyles = cn(OUTLINE_BUTTON, "flex-1 sm:flex-none");
 
 export default function BonsaiFMPlayer({ className }: { className?: string }) {
   const queryClient = useQueryClient();
@@ -110,7 +110,7 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
     <Ghost name="bonsai-fm-player" isLoading={isMusicQueueLoading}>
       <section
         className={cn(
-          "flex min-w-0 flex-1 flex-col gap-4 self-start rounded-xl border border-accent p-4 max-sm:w-full sm:gap-6 sm:rounded-none sm:border-0 sm:p-0",
+          "flex min-w-0 flex-1 flex-col gap-4 self-start max-sm:w-full sm:gap-6",
           className,
         )}
       >
@@ -119,8 +119,11 @@ export default function BonsaiFMPlayer({ className }: { className?: string }) {
           label={song ? `Cover von ${song.title}` : "Kein Song aktiv"}
           sizes="(min-width: 1024px) 288px, (min-width: 640px) 224px, 128px"
           loading="eager"
-          className="size-32 self-center rounded-lg bg-linear-to-br from-bonsai-leaf to-bonsai-face sm:size-56 lg:size-72"
-          iconClassName="size-10 text-bonsai-pot-light"
+          className={cn(
+            PLACEHOLDER,
+            "size-32 self-center rounded-2xl shadow-[0_20px_60px_-20px_#4ade8040] sm:size-56 lg:size-72",
+          )}
+          iconClassName="size-10 text-bonsai-leaf-light"
         />
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <div className="min-w-0 text-center">

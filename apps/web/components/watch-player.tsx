@@ -19,6 +19,7 @@ import {
   watchQueueQueryKey,
 } from "@/hooks/use-watch-queue";
 import { apiClient } from "@/lib/api-client";
+import { ICON_TILE, OUTLINE_BUTTON, PLACEHOLDER } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
@@ -57,8 +58,7 @@ type LeadKind = "seek" | "resume";
 
 type PlaybackIssue = "blocked" | "unavailable" | "stuck";
 
-const buttonStyles =
-  "hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30";
+const buttonStyles = OUTLINE_BUTTON;
 
 const ERROR_TITLES: Record<PlaybackAction, string> = {
   play: "Fehler beim Abspielen des Videos",
@@ -455,9 +455,21 @@ export default function WatchPlayer({ className }: { className?: string }) {
             onError={handlePlayerError}
           />
         ) : (
-          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl bg-linear-to-br from-bonsai-leaf to-bonsai-face p-4 text-center">
-            <TvMinimalPlay className="size-10 text-bonsai-pot-light" />
-            <p className="text-sm font-medium text-bonsai-pot-light">
+          <div
+            className={cn(
+              PLACEHOLDER,
+              "flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-2xl p-4 text-center",
+            )}
+          >
+            <span
+              className={cn(
+                ICON_TILE,
+                "size-14 rounded-2xl text-bonsai-leaf-light",
+              )}
+            >
+              <TvMinimalPlay className="size-6" />
+            </span>
+            <p className="text-sm font-medium text-neutral-400">
               Füge ein Video hinzu, um zusammen zu schauen
             </p>
           </div>

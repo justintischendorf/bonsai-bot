@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
+import { CARD, PRIMARY_BUTTON } from "@/lib/styles";
 
 import LoadingSpinner from "./loading-spinner";
 import { toast } from "./ui/toast";
@@ -52,9 +53,11 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className={cn(CARD, "py-8 ring-0")}>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Willkommen zurück</CardTitle>
+          <CardTitle className="text-2xl font-medium tracking-tight text-white">
+            Willkommen zurück
+          </CardTitle>
           <CardDescription>
             Melde dich mit deinem Discord-Account an, um fortzufahren.
           </CardDescription>
@@ -64,6 +67,7 @@ export function LoginForm({
             <FieldGroup>
               <Field>
                 <Button
+                  className={cn(PRIMARY_BUTTON, "h-10")}
                   variant="outline"
                   type="button"
                   disabled={loading}
@@ -91,7 +95,7 @@ export function LoginForm({
           </form>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
+      <FieldDescription className="px-6 text-center text-neutral-500">
         Dieser Dienst wird ausschließlich privat genutzt. Sofern du nicht
         Mitglied unseres Discord-Servers bist, kannst du dich nicht anmelden.
       </FieldDescription>

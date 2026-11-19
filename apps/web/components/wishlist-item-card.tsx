@@ -22,6 +22,7 @@ import {
 import { wishlistQueryKey, type WishlistItem } from "@/hooks/use-wishlist";
 import { apiClient } from "@/lib/api-client";
 import { useSession } from "@/lib/auth-client";
+import { CARD } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 import { ConfirmAlert } from "./confirm-alert";
@@ -134,7 +135,8 @@ export default function WishlistItemCard({
   return (
     <article
       className={cn(
-        "flex flex-col gap-2.5 rounded-xl border border-accent p-3",
+        CARD,
+        "group/card flex flex-col gap-2.5 p-4 transition-colors hover:border-white/15",
         className,
       )}
     >
@@ -143,7 +145,7 @@ export default function WishlistItemCard({
         label={`Titelbild von ${item.name}`}
         sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         loading={imageLoading}
-        className="w-full rounded-md mb-2"
+        className="mb-2 w-full rounded-2xl ring-1 ring-white/10 transition-transform duration-300 group-hover/card:scale-[1.01]"
         iconClassName="size-8"
       />
       <div className="flex items-start justify-between gap-2">
