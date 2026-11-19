@@ -180,7 +180,7 @@ export default function WishlistItemCard({
                   aria-label={`${item.name} gefällt mir`}
                   aria-pressed={item.likedByMe}
                   className={cn(
-                    "relative text-muted-foreground transition-colors duration-300 hover:bg-bonsai-leaf-light/10 hover:text-bonsai-leaf-light data-popup-open:text-bonsai-leaf-light dark:hover:bg-bonsai-leaf-light/15",
+                    "relative text-muted-foreground   hover:bg-bonsai-leaf-light/10 hover:text-bonsai-leaf-light data-popup-open:text-bonsai-leaf-light dark:hover:bg-bonsai-leaf-light/15",
                     item.likedByMe && "text-bonsai-leaf-light",
                   )}
                   onClick={(e) => {
@@ -229,7 +229,7 @@ export default function WishlistItemCard({
           </HoverCard>
 
           <Button
-            className="text-muted-foreground transition-colors duration-300 hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+            className="text-muted-foreground   hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
             variant="ghost"
             size="icon-sm"
             type="button"
@@ -252,7 +252,7 @@ export default function WishlistItemCard({
             <DialogTrigger
               render={
                 <button
-                  className="cursor-pointer py-1 text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-bonsai-leaf-light"
+                  className="cursor-pointer py-1 text-sm font-medium text-muted-foreground   hover:text-bonsai-leaf-light"
                   type="button"
                   aria-label={`Mehr anzeigen: Beschreibung von ${item.name}`}
                 >
@@ -285,11 +285,11 @@ export default function WishlistItemCard({
                 <div className="flex items-baseline justify-between gap-2">
                   <Link
                     href={link}
-                    className="group -my-0.5 flex w-fit items-center gap-1 py-0.5 text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-bonsai-leaf-light"
+                    className="group -my-0.5 flex w-fit items-center gap-1 py-0.5 text-sm font-medium text-muted-foreground   hover:text-bonsai-leaf-light"
                   >
                     <Logo className="size-3.5 shrink-0" />
                     {name}
-                    <MoveRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    <MoveRight className="size-4   " />
                   </Link>
                   {price !== null && (
                     <span className="shrink-0 text-sm font-medium text-bonsai-leaf-light">

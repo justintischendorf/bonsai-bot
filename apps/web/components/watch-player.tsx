@@ -75,7 +75,7 @@ type LeadKind = "seek" | "resume";
 type PlaybackIssue = "blocked" | "unavailable" | "stuck";
 
 const buttonStyles =
-  "transition-colors duration-300 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30";
+  "hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30";
 
 const ERROR_TITLES: Record<PlaybackAction, string> = {
   play: "Fehler beim Abspielen des Videos",

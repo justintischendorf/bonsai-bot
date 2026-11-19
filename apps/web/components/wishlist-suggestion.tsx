@@ -44,7 +44,7 @@ export default function WishlistSuggestion({
     <article
       className={cn(
         "relative flex w-full items-center gap-3 rounded-xl border p-3 sm:w-1/2 lg:w-1/4",
-        href && "transition-colors duration-300 hover:border-bonsai-leaf-light",
+        href && "hover:border-bonsai-leaf-light",
         className,
       )}
     >
@@ -85,11 +85,11 @@ export default function WishlistSuggestion({
               >
                 <Link
                   href={link}
-                  className="group relative z-10 -my-0.5 flex w-fit items-center gap-1 py-0.5 text-xs font-medium text-muted-foreground transition-colors duration-300 hover:text-bonsai-leaf-light"
+                  className="group relative z-10 -my-0.5 flex w-fit items-center gap-1 py-0.5 text-xs font-medium text-muted-foreground hover:text-bonsai-leaf-light"
                 >
                   <Logo className="size-3 shrink-0" />
                   {name}
-                  <MoveRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  <MoveRight className="size-3.5" />
                 </Link>
                 {price != null && (
                   <span className="shrink-0 text-xs font-medium text-bonsai-leaf-light">
