@@ -32,23 +32,6 @@ Lavalink, SQLite through Prisma and Better Auth for the Discord login.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  browser[Browser] -->|/| web[Web dashboard<br/>Next.js]
-  browser -->|/api, WebSocket| api[API<br/>Elysia]
-  web -->|Treaty| api
-  web -->|session check| auth[Better Auth]
-  api --> auth
-  api --> db[(SQLite)]
-  api -->|internal HTTP| bot[Discord bot<br/>discord.js]
-  api -->|REST| discord[Discord]
-  bot --> discord
-  bot --> db
-  bot --> lavalink[Lavalink]
-  lavalink --> cipher[yt-cipher]
-  lavalink --> youtube[YouTube]
-```
-
 Web dashboard and API run under the same domain (`/` and `/api`). The API
 talks to Discord for server data and to the bot over an internal HTTP server
 secured by `BOT_INTERNAL_SECRET`. The bot plays music through Lavalink, which
