@@ -12,12 +12,14 @@ import bonsaiBotTitle from "@/assets/logos/bonsai-bot-title.svg";
 import { BonsaiLogo } from "@/components/bonsai-logo";
 import MemberCard from "@/components/member-card";
 import NowPlaying from "@/components/now-playing";
+import NowWatching from "@/components/now-watching";
 import WishlistSuggestion from "@/components/wishlist-suggestion";
 import { useDiscordMemberInfo } from "@/hooks/use-discord-member-info";
 import { useFloatToTextBottom } from "@/hooks/use-float-to-text-bottom";
 import { useLimitVisibleItems } from "@/hooks/use-limit-visible-items";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useMusicQueue } from "@/hooks/use-music-queue";
+import { useWatchLive, useWatchQueue } from "@/hooks/use-watch-queue";
 import { useWishlistSuggestion } from "@/hooks/use-wishlist-suggestion";
 
 gsap.registerPlugin(useGSAP);
@@ -65,8 +67,11 @@ export default function DashboardPage() {
 
   const { data: wishlistSuggestionResponse } = useWishlistSuggestion();
   const { data: musicResponse } = useMusicQueue();
+  const { data: watchResponse } = useWatchQueue();
+  useWatchLive();
   const hasSuggestion = !!wishlistSuggestionResponse?.data?.server;
   const hasSong = !!musicResponse?.data?.server?.current;
+  const hasVideo = !!watchResponse?.data?.server?.current;
 
   const pageRef = useRef<HTMLElement>(null);
 
@@ -89,10 +94,11 @@ export default function DashboardPage() {
 
   return (
     <main ref={pageRef}>
-      {(hasSuggestion || hasSong) && (
+      {(hasSuggestion || hasSong || hasVideo) && (
         <div className="flex-col sm:flex-row flex gap-5 pb-5 px-4 sm:px-8 xl:px-20">
           <WishlistSuggestion href="/wishlist" />
           <NowPlaying href="/bonsai-fm" />
+          <NowWatching href="/bonsai-watch" />
         </div>
       )}
       <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-x-0 lg:gap-y-16">
