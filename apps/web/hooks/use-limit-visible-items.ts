@@ -16,8 +16,9 @@ export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
       // A hidden list has no layout to measure; showing it triggers the observer.
       if (list.clientWidth === 0) return;
 
-      const lastVisible = list.children[maxVisible - 1];
-      if (!lastVisible || list.children.length <= maxVisible) {
+      const items = getItems(list);
+      const lastVisible = items[maxVisible - 1];
+      if (!lastVisible || items.length <= maxVisible) {
         list.style.maxHeight = "";
         return;
       }
@@ -45,4 +46,12 @@ export function useLimitVisibleItems(maxVisible: number, itemCount: number) {
   }, [maxVisible, itemCount]);
 
   return listRef;
+}
+
+// Wrappers with `display: contents` (e.g. Ghost) have no box of their own, so the
+// items laid out by the list are their children
+function getItems(element: Element): Element[] {
+  return Array.from(element.children).flatMap((child) =>
+    getComputedStyle(child).display === "contents" ? getItems(child) : [child],
+  );
 }
