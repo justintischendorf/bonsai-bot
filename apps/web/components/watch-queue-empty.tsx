@@ -10,7 +10,7 @@ import {
 
 export default function WatchQueueEmpty() {
   return (
-    <Empty className="stagger py-12">
+    <Empty className="py-12">
       <EmptyHeader className="max-w-md">
         <EmptyMedia
           variant="icon"

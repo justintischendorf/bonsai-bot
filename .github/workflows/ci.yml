@@ -1,27 +1,40 @@
 name: CI
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main, develop]
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
+  # Keep the job id "ci", it is meant to be the required status check
+  # for main and develop.
   ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+
+    env:
+      # Only needed for prisma generate, no database is created
+      DATABASE_URL: file:./data/ci.db
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v7
 
-      - name: Setup Bun
+      - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -32,5 +45,12 @@ jobs:
       - name: Lint
         run: bun run lint
 
-      - name: Check types
+      - name: Typecheck
         run: bun run check-types
+
+      - name: Build
+        # apps/web/lib/auth-client.ts throws without them while prerendering
+        env:
+          NEXT_PUBLIC_API_SERVER_URL: http://localhost:3001
+          NEXT_PUBLIC_AUTH_BASE_URL: http://localhost:3001
+        run: bun run build

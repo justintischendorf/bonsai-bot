@@ -14,7 +14,7 @@ import { Progress } from "./ui/progress";
 import { toast } from "./ui/toast";
 
 const buttonStyles =
-  "flex-1 transition-colors duration-300 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:flex-none";
+  "flex-1 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:flex-none";
 
 export default function BonsaiFMPlayer({ className }: { className?: string }) {
   const queryClient = useQueryClient();
