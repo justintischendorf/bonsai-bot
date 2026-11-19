@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Bun 1.4.4 instead of 1.4.2 everywhere: in the Docker images, in CI and
+  in `package.json`. ([#36], [#40])
+
 ### Removed
 
 - The unused `eslint` and `eslint-config-next` packages, linting runs on
@@ -219,4 +224,6 @@ and this project adheres to
 [#30]: https://github.com/justintischendorf/Bonsai-Bot/pull/30
 [#31]: https://github.com/justintischendorf/Bonsai-Bot/pull/31
 [#33]: https://github.com/justintischendorf/Bonsai-Bot/pull/33
+[#36]: https://github.com/justintischendorf/Bonsai-Bot/pull/36
 [#39]: https://github.com/justintischendorf/Bonsai-Bot/pull/39
+[#40]: https://github.com/justintischendorf/Bonsai-Bot/pull/40
