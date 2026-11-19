@@ -1,32 +1,44 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListPlus } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { Check, Gamepad2, ListPlus, X } from "lucide-react";
+import { useRef, useState } from "react";
 
+import {
+  FORM_DIALOG_CONTENT,
+  FormDialogFooter,
+  FormDialogHeader,
+  IconField,
+} from "@/components/form-dialog";
+import {
+  InstantGamingLogo,
+  PlayStationLogo,
+  SteamLogo,
+} from "@/components/shop-logos";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { wishlistQueryKey } from "@/hooks/use-wishlist";
 import { apiClient } from "@/lib/api-client";
+import { OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { toast } from "./ui/toast";
 
+const CROSSPLAY_OPTIONS = [
+  { value: "yes", label: "Ja", Icon: Check },
+  { value: "no", label: "Nein", Icon: X },
+];
+
 export function WishlistItemDialog() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
+  const firstFieldRef = useRef<HTMLInputElement>(null);
   const [steamLink, setSteamLink] = useState("");
   const [instantGamingLink, setInstantGamingLink] = useState("");
   const [playstationLink, setPlaystationLink] = useState("");
@@ -92,7 +104,7 @@ export function WishlistItemDialog() {
       <DialogTrigger
         render={
           <Button
-            className="w-full shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30 sm:w-auto"
+            className={cn(PRIMARY_BUTTON, "w-full shrink-0 sm:w-auto")}
             variant="outline"
             type="button"
           >
@@ -101,123 +113,127 @@ export function WishlistItemDialog() {
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent
+        className={FORM_DIALOG_CONTENT}
+        initialFocus={firstFieldRef}
+      >
         <form
-          className="grid gap-4"
+          className="grid gap-6"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}
         >
-          <DialogHeader>
-            <DialogTitle>Spiel auf die Wunschliste setzen</DialogTitle>
-            <DialogDescription>
-              Am besten gibst du den Link zum{" "}
-              {
-                <Link
-                  className="text-bonsai-leaf-light"
-                  href="https://store.steampowered.com/"
-                >
-                  <span className="text-bonsai-leaf-light">Steam Store</span>
-                </Link>
-              }
-              , zum{" "}
-              <Link
-                className="text-bonsai-leaf-light"
-                href="https://www.instant-gaming.com/"
-              >
-                <span className="text-bonsai-leaf-light">
-                  Instant Gaming Store
-                </span>
-              </Link>{" "}
-              und zum{" "}
-              <Link
-                className="text-bonsai-leaf-light"
-                href="https://store.playstation.com/de-de/pages/latest"
-              >
-                <span className="text-bonsai-leaf-light">
-                  PlayStation Store
-                </span>
-              </Link>{" "}
-              an, damit Bonsai die Preise vergleichen kann und das günstigste
-              Angebot findet.
-            </DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="steam-link">Steam Link</Label>
-              <Input
-                aria-invalid={noLinkProvidedError}
-                id="steam-link"
-                name="steam-link"
-                value={steamLink}
-                onChange={(e) => setSteamLink(e.target.value)}
-                placeholder="https://store.steampowered.com/app/123456/example-game/"
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="instant-gaming-link">Instant Gaming Link</Label>
-              <Input
-                aria-invalid={noLinkProvidedError}
-                id="instant-gaming-link"
-                name="instant-gaming-link"
-                value={instantGamingLink}
-                onChange={(e) => setInstantGamingLink(e.target.value)}
-                placeholder="https://www.instant-gaming.com/de/1234-buy-example-game-steam-key-global/"
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="playstation-link">PlayStation Store Link</Label>
-              <Input
-                aria-invalid={noLinkProvidedError}
-                id="playstation-link"
-                name="playstation-link"
-                value={playstationLink}
-                onChange={(e) => setPlaystationLink(e.target.value)}
-                placeholder="https://store.playstation.com/de-de/concept/12345678"
-              />
-            </Field>
-            <Field>
-              <Label id="crossplay-label">
-                Ist Crossplay verfügbar?
-                <span className="text-sm text-muted-foreground">
-                  (Playstation 5 - PC)
+          <FormDialogHeader
+            Icon={Gamepad2}
+            eyebrow="Wunschliste"
+            title="Spiel hinzufügen"
+          >
+            Gib am besten die Links aller drei Stores an, dann vergleicht Bonsai
+            die Preise und findet das{" "}
+            <strong className="font-medium text-neutral-100">
+              günstigste Angebot
+            </strong>
+            .
+          </FormDialogHeader>
+          <div className="relative flex flex-col gap-4">
+            <IconField
+              id="steam-link"
+              ref={firstFieldRef}
+              label="Steam"
+              Icon={SteamLogo}
+              href="https://store.steampowered.com/"
+              hrefLabel="Store"
+              aria-invalid={noLinkProvidedError}
+              name="steam-link"
+              value={steamLink}
+              onChange={(e) => setSteamLink(e.target.value)}
+              placeholder="https://store.steampowered.com/app/123456/example-game/"
+            />
+            <IconField
+              id="instant-gaming-link"
+              label="Instant Gaming"
+              Icon={InstantGamingLogo}
+              href="https://www.instant-gaming.com/"
+              hrefLabel="Store"
+              aria-invalid={noLinkProvidedError}
+              name="instant-gaming-link"
+              value={instantGamingLink}
+              onChange={(e) => setInstantGamingLink(e.target.value)}
+              placeholder="https://www.instant-gaming.com/de/1234-buy-example-game-steam-key-global/"
+            />
+            <IconField
+              id="playstation-link"
+              label="PlayStation Store"
+              Icon={PlayStationLogo}
+              href="https://store.playstation.com/de-de/pages/latest"
+              hrefLabel="Store"
+              aria-invalid={noLinkProvidedError}
+              name="playstation-link"
+              value={playstationLink}
+              onChange={(e) => setPlaystationLink(e.target.value)}
+              placeholder="https://store.playstation.com/de-de/concept/12345678"
+            />
+            <div className="flex flex-col gap-2">
+              <Label id="crossplay-label" className="text-neutral-200">
+                Crossplay
+                <span className="text-xs font-normal text-neutral-500">
+                  PlayStation 5 und PC
                 </span>
               </Label>
               <RadioGroup
                 aria-labelledby="crossplay-label"
+                className="grid-cols-2"
                 value={crossplayAvailable ? "yes" : "no"}
                 onValueChange={(value) =>
                   setCrossplayAvailable(value === "yes")
                 }
               >
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="yes" id="crossplay-available" />
-                  <Label htmlFor="crossplay-available">ja</Label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="no" id="crossplay-not-available" />
-                  <Label htmlFor="crossplay-not-available">nein</Label>
-                </div>
+                {CROSSPLAY_OPTIONS.map(({ value, label, Icon }) => (
+                  <Label
+                    key={value}
+                    htmlFor={`crossplay-${value}`}
+                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-3.5 py-3 font-normal text-neutral-300 transition-colors hover:border-white/20 has-data-checked:border-bonsai-leaf-light/60 has-data-checked:bg-bonsai-leaf/10 has-data-checked:text-white"
+                  >
+                    <RadioGroupItem
+                      value={value}
+                      id={`crossplay-${value}`}
+                      className="data-checked:border-bonsai-leaf-light data-checked:bg-bonsai-leaf-light dark:data-checked:bg-bonsai-leaf-light"
+                    />
+                    <Icon className="size-4 text-neutral-500" />
+                    {label}
+                  </Label>
+                ))}
               </RadioGroup>
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
+            </div>
+          </div>
+          <FormDialogFooter>
             <DialogClose
               render={
-                <Button variant="outline" type="button">
+                <Button
+                  className={OUTLINE_BUTTON}
+                  variant="outline"
+                  type="button"
+                >
                   Abbrechen
                 </Button>
               }
             />
-            <Button type="submit">
+            <Button
+              className={PRIMARY_BUTTON}
+              type="submit"
+              disabled={isAddingWishlistItem}
+            >
               {isAddingWishlistItem ? (
                 <LoadingSpinner message="Wird hinzugefügt..." />
               ) : (
-                "Auf Wunschliste setzen"
+                <>
+                  <ListPlus />
+                  Auf die Wunschliste
+                </>
               )}
             </Button>
-          </DialogFooter>
+          </FormDialogFooter>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,4 +1,3 @@
-import { Ghost } from "ghostlyjs";
 import Link from "next/link";
 
 import { useMusicQueue } from "@/hooks/use-music-queue";
@@ -13,46 +12,43 @@ export default function NowPlaying({
   href?: string;
   className?: string;
 }) {
-  const { data: musicResponse, isLoading: isMusicQueueLoading } =
-    useMusicQueue();
+  const { data: musicResponse } = useMusicQueue();
   const playback = musicResponse?.data?.server;
   const song = playback?.current;
 
   if (!song) return null;
 
   return (
-    <Ghost name="music-queue-now-playing" isLoading={isMusicQueueLoading}>
-      <article
-        className={cn(
-          "relative flex w-full items-center gap-3 rounded-xl border p-3 sm:w-1/2 lg:w-1/4",
-          href && "hover:border-bonsai-leaf-light",
-          className,
-        )}
-      >
-        {href && (
-          <Link
-            href={href}
-            aria-label="Zu Bonsai FM"
-            className="absolute inset-0 rounded-xl"
-          />
-        )}
-        <SongCover
-          artworkUrl={song.artworkUrl}
-          label={`Cover von ${song.title}`}
-          sizes="52px"
-          className="size-13 rounded-md bg-muted"
-          iconClassName="size-5 text-muted-foreground"
+    <article
+      className={cn(
+        "relative flex w-full items-center gap-3 rounded-xl border p-3 sm:w-1/2 lg:w-1/4",
+        href && "hover:border-bonsai-leaf-light",
+        className,
+      )}
+    >
+      {href && (
+        <Link
+          href={href}
+          aria-label="Zu Bonsai FM"
+          className="absolute inset-0 rounded-xl"
         />
-        <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <p className="text-xs text-muted-foreground">
-            {playback.paused ? "Pausiert" : "Läuft gerade"}
-          </p>
-          <h2 className="truncate text-sm font-semibold">{song.title}</h2>
-          <p className="truncate text-xs font-medium text-muted-foreground">
-            {song.artist}
-          </p>
-        </div>
-      </article>
-    </Ghost>
+      )}
+      <SongCover
+        artworkUrl={song.artworkUrl}
+        label={`Cover von ${song.title}`}
+        sizes="52px"
+        className="size-13 rounded-md bg-muted"
+        iconClassName="size-5 text-muted-foreground"
+      />
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        <p className="text-xs text-muted-foreground">
+          {playback.paused ? "Pausiert" : "Läuft gerade"}
+        </p>
+        <h2 className="truncate text-sm font-semibold">{song.title}</h2>
+        <p className="truncate text-xs font-medium text-muted-foreground">
+          {song.artist}
+        </p>
+      </div>
+    </article>
   );
 }

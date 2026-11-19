@@ -31,6 +31,7 @@ import {
   watchQueueQueryKey,
 } from "@/hooks/use-watch-queue";
 import { apiClient } from "@/lib/api-client";
+import { CARD_ROW } from "@/lib/styles";
 import { cn } from "@/lib/utils";
 
 import { Button } from "./ui/button";
@@ -85,7 +86,10 @@ function SortableVideo({
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform) }}
       className={cn(
-        "flex shrink-0 items-center gap-2 rounded-xl border border-accent bg-background p-2 sm:gap-3 sm:p-3",
+        cn(
+          "flex shrink-0 items-center gap-2 rounded-xl border p-2 sm:gap-3 sm:p-3",
+          CARD_ROW,
+        ),
         isDragging && "relative z-10 border-bonsai-leaf-light shadow-lg",
       )}
     >
@@ -217,49 +221,48 @@ export default function WatchQueue() {
   }
 
   return (
-    <Ghost name="watch-queue" isLoading={isWatchQueueLoading}>
-      <section className="flex min-w-0 flex-1 flex-col gap-4">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
-          <h2 className="text-lg font-semibold">Warteschlange</h2>
-
+    <section className="flex min-w-0 flex-1 flex-col gap-4">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3">
+        <h2 className="text-lg font-semibold">Warteschlange</h2>
+        <Ghost name="watch-queue-video-count" isLoading={isWatchQueueLoading}>
           <span className="text-sm text-muted-foreground">
             {videos.length} {videos.length === 1 ? "Video" : "Videos"}
           </span>
-        </div>
-        {!isWatchQueueLoading && videos.length === 0 && <WatchQueueEmpty />}
-        <DndContext
-          id="watch-queue"
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[verticalOnly]}
-          accessibility={{
-            announcements: dragAnnouncements,
-            screenReaderInstructions: dragInstructions,
-          }}
-          onDragStart={() => setVideosWhileDragging(videos)}
-          onDragEnd={handleDragEnd}
-          onDragCancel={() => setVideosWhileDragging(null)}
+        </Ghost>
+      </div>
+      {!isWatchQueueLoading && videos.length === 0 && <WatchQueueEmpty />}
+      <DndContext
+        id="watch-queue"
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[verticalOnly]}
+        accessibility={{
+          announcements: dragAnnouncements,
+          screenReaderInstructions: dragInstructions,
+        }}
+        onDragStart={() => setVideosWhileDragging(videos)}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setVideosWhileDragging(null)}
+      >
+        <SortableContext
+          items={videos.map((video) => video.id)}
+          strategy={verticalListSortingStrategy}
         >
-          <SortableContext
-            items={videos.map((video) => video.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
-              <Ghost name="watch-queue" isLoading={isWatchQueueLoading}>
-                {videos.map((video, index) => (
-                  <SortableVideo
-                    key={video.id}
-                    video={video}
-                    index={index}
-                    isRemoveDisabled={isRemovingVideo}
-                    onRemove={removeVideo}
-                  />
-                ))}
-              </Ghost>
-            </div>
-          </SortableContext>
-        </DndContext>
-      </section>
-    </Ghost>
+          <div ref={listRef} className="flex flex-col gap-2 overflow-y-auto">
+            <Ghost name="watch-queue" isLoading={isWatchQueueLoading} count>
+              {videos.map((video, index) => (
+                <SortableVideo
+                  key={video.id}
+                  video={video}
+                  index={index}
+                  isRemoveDisabled={isRemovingVideo}
+                  onRemove={removeVideo}
+                />
+              ))}
+            </Ghost>
+          </div>
+        </SortableContext>
+      </DndContext>
+    </section>
   );
 }

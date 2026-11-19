@@ -1,8 +1,3 @@
-# Für Dokploy (Typ "Docker Compose", Isolated Deployments aus). Anleitung: README, Abschnitt "Produktion".
-# Domains:          in Dokploy dieselbe Domain für web (Pfad /, Port 3000) und api (Pfad /api, Port 3001)
-# Slash-Commands:   docker compose -f docker-compose-prod.yml run --rm deploy-commands
-# Konfiguration:    Variablen aus .env.example im Environment-Tab von Dokploy setzen
-
 name: bonsai-bot
 
 x-hardening: &hardening
@@ -22,7 +17,6 @@ x-hardening: &hardening
       max-file: "5"
 
 services:
-  # Bringt die Datenbank vor dem Start der API auf den aktuellen Stand und beendet sich dann.
   migrate:
     <<: *hardening
     build:
@@ -37,7 +31,6 @@ services:
     networks:
       - egress
 
-  # Dasselbe für die eigene Datenbank des Bots.
   migrate-bot:
     <<: *hardening
     build:
@@ -74,17 +67,14 @@ services:
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?in .env setzen}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:?in .env setzen}
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:?in .env setzen}
-      # Optional: Ohne Channel werden Preissenkungen nur ins Log geschrieben.
       WISHLIST_CHANNEL_ID: ${WISHLIST_CHANNEL_ID:-}
       BOT_INTERNAL_URL: http://bot:3002
       BOT_INTERNAL_SECRET: ${BOT_INTERNAL_SECRET:?in .env setzen}
     volumes:
       - database:/data
-    # Keine "ports": Traefik von Dokploy erreicht die API über das dokploy-network.
     expose:
       - "3001"
     labels:
-      # Der Container hängt in mehreren Netzen, Traefik muss das richtige verwenden.
       - traefik.docker.network=dokploy-network
     networks:
       - egress
@@ -104,13 +94,11 @@ services:
     mem_limit: 1g
     tmpfs:
       - /tmp
-      # Next.js legt hier optimierte Bilder ab, der Rest des Dateisystems bleibt schreibgeschützt.
       - /app/apps/web/.next/cache:uid=1000,gid=1000
     depends_on:
       migrate:
         condition: service_completed_successfully
     environment:
-      # proxy.ts prüft die Session direkt in der Datenbank, deshalb dasselbe Volume wie die API.
       DATABASE_URL: file:/data/data.db
       WEB_SERVER_URL: ${WEB_SERVER_URL:?in .env setzen}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:?in .env setzen}
@@ -120,16 +108,13 @@ services:
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:?in .env setzen}
     volumes:
       - database:/data
-    # Keine "ports": Port 3000 auf dem Server belegt Dokploy selbst.
     expose:
       - "3000"
     labels:
-      # Der Container hängt in mehreren Netzen, Traefik muss das richtige verwenden.
       - traefik.docker.network=dokploy-network
     networks:
       - egress
 
-  # Spielt die Musik ab. Bewusst keine "ports": nur der Bot greift über das Docker-Netz darauf zu.
   lavalink:
     <<: *hardening
     image: ghcr.io/lavalink-devs/lavalink:4.2.2
@@ -140,22 +125,16 @@ services:
     depends_on:
       - yt-cipher
     tmpfs:
-      # Lavalink entpackt native Audio-Bibliotheken nach /tmp und lädt sie von dort, deshalb "exec".
       - /tmp:exec
-      # Das Plugin wird beim Start hierhin geladen, der Rest des Dateisystems bleibt schreibgeschützt.
       - /opt/Lavalink/plugins:uid=322,gid=322
     environment:
       SERVER_PORT: 2333
       SERVER_ADDRESS: 0.0.0.0
       LAVALINK_SERVER_PASSWORD: ${LAVALINK_PASSWORD:?in .env setzen}
       _JAVA_OPTIONS: -Xmx512m
-      # Offizieller Snapshot statt Release 1.18.2: Mit dem Release schlug die Wiedergabe bei 9 von 12 Songs fehl, hiermit bei keinem.
-      # Beim nächsten offiziellen Release wieder auf eine feste Version wechseln.
       LAVALINK_PLUGINS_0_DEPENDENCY: dev.lavalink.youtube:youtube-plugin:2be8e542d3f6f178e048dca565892684c2e40177
       LAVALINK_PLUGINS_0_SNAPSHOT: "true"
-      # Die eingebaute YouTube-Quelle ist veraltet, das Plugin ersetzt sie.
       LAVALINK_SERVER_SOURCES_YOUTUBE: "false"
-      # Alles andere bleibt aus: "http" und "local" würden Zugriffe auf interne Adressen und Dateien erlauben.
       LAVALINK_SERVER_SOURCES_BANDCAMP: "false"
       LAVALINK_SERVER_SOURCES_SOUNDCLOUD: "false"
       LAVALINK_SERVER_SOURCES_TWITCH: "false"
@@ -169,7 +148,6 @@ services:
       PLUGINS_YOUTUBE_ALLOWSEARCH: "true"
       PLUGINS_YOUTUBE_ALLOWDIRECTVIDEOIDS: "true"
       PLUGINS_YOUTUBE_ALLOWDIRECTPLAYLISTIDS: "false"
-      # MUSIC sucht nur. Fällt ein Client beim Abspielen aus, greift der nächste; TV funktioniert nur mit OAuth.
       PLUGINS_YOUTUBE_CLIENTS_0: MUSIC
       PLUGINS_YOUTUBE_CLIENTS_1: WEB
       PLUGINS_YOUTUBE_CLIENTS_2: MWEB
@@ -181,7 +159,6 @@ services:
       PLUGINS_YOUTUBE_REMOTECIPHER_URL: http://yt-cipher:8001
       PLUGINS_YOUTUBE_REMOTECIPHER_PASSWORD: ${YT_CIPHER_TOKEN:?in .env setzen}
       PLUGINS_YOUTUBE_REMOTECIPHER_USERAGENT: bonsai-bot
-      # Nur nötig, wenn YouTube die IP des Servers blockiert.
       PLUGINS_YOUTUBE_OAUTH_ENABLED: ${YOUTUBE_OAUTH_ENABLED:-false}
       PLUGINS_YOUTUBE_OAUTH_REFRESHTOKEN: ${YOUTUBE_OAUTH_REFRESH_TOKEN:-}
     healthcheck:
@@ -192,12 +169,10 @@ services:
       timeout: 5s
       start_period: 60s
       retries: 4
-    # Braucht "egress", um Songs von YouTube zu laden.
     networks:
       - egress
       - internal
 
-  # Entschlüsselt die Stream-Adressen von YouTube für Lavalink.
   yt-cipher:
     <<: *hardening
     image: ghcr.io/kikkia/yt-cipher@sha256:4c5ec381ff57336cfc24822d2b526a5ad7cd0171f61065a1bbc87bb736842449
@@ -206,9 +181,7 @@ services:
     environment:
       API_TOKEN: ${YT_CIPHER_TOKEN:?in .env setzen}
       OVERRIDE_SCRIPT_VARIANT: IAS
-      # Das Dateisystem ist schreibgeschützt, der Player-Cache liegt deshalb im Arbeitsspeicher.
       XDG_CACHE_HOME: /tmp/cache
-    # Braucht "egress", um die Player-Skripte von YouTube zu laden.
     networks:
       - egress
       - internal
@@ -234,21 +207,17 @@ services:
       BOT_INTERNAL_HOST: 0.0.0.0
       BOT_INTERNAL_PORT: 3002
       BOT_INTERNAL_SECRET: ${BOT_INTERNAL_SECRET:?in .env setzen}
-      # Eigene Datenbank nur für die Warteschlange, die API fragt den Bot danach.
       DATABASE_URL: file:/data/data.db
       LAVALINK_HOST: lavalink
       LAVALINK_PORT: 2333
       LAVALINK_PASSWORD: ${LAVALINK_PASSWORD:?in .env setzen}
-      # Für den Befehl /link: muss die öffentliche Adresse der Website sein.
       WEB_SERVER_URL: ${WEB_SERVER_URL:?in .env setzen}
     volumes:
       - bot-data:/data
-    # Bewusst keine "ports": der interne Server ist nur für die API im Docker-Netz erreichbar.
     networks:
       - egress
       - internal
 
-  # Nur bei Änderungen an den Slash-Commands manuell ausführen.
   deploy-commands:
     <<: *hardening
     profiles:

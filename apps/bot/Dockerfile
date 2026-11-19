@@ -1,8 +1,6 @@
-# Build-Kontext ist das Repo-Root: docker build -f apps/bot/Dockerfile .
 FROM oven/bun:1.4.4-slim AS base
 WORKDIR /app
 
-# Alle Manifeste sind nötig, damit das Lockfile zum Workspace passt.
 FROM base AS manifests
 COPY package.json bun.lock ./
 COPY apps/api/package.json apps/api/
@@ -13,7 +11,6 @@ COPY packages/database/package.json packages/database/
 COPY packages/logger/package.json packages/logger/
 COPY packages/treaty/package.json packages/treaty/
 
-# Komplette Installation mit Prisma-CLI: erzeugt nur den Client, Migrationen laufen über die API.
 FROM manifests AS tooling
 RUN bun install --frozen-lockfile
 COPY packages/database/prisma packages/database/prisma

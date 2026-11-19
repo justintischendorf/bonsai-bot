@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+import { Divider } from "@/components/decor";
 import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
@@ -77,10 +78,13 @@ export default function DashboardLayout({
           </div>
         </header>
         {children}
-        <footer className="mt-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 pt-8 text-center text-sm text-muted-foreground lg:pt-20">
-          <span>© {currentYear} Bonsai Bot. Alle Rechte vorbehalten.</span>
-          <span aria-hidden>·</span>
-          <span className="tabular-nums">v1.6.0</span>
+        <footer className="mt-auto flex flex-col gap-6 px-4 pt-12 sm:px-8 lg:pt-20 xl:px-20">
+          <Divider />
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm text-neutral-500">
+            <span>© {currentYear} Bonsai Bot. Alle Rechte vorbehalten.</span>
+            <span aria-hidden>·</span>
+            <span className="tabular-nums">v1.6.0</span>
+          </div>
         </footer>
       </main>
     </GhostlyProvider>

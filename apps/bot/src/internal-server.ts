@@ -3,7 +3,6 @@ import type { Client } from "discord.js";
 import { config, required } from "./config.ts";
 import { MusicError, type MusicPlayer } from "./music.ts";
 
-// Nur für die API gedacht: nie öffentlich freigeben, alle Routen außer /health verlangen das gemeinsame Secret.
 export function startInternalServer(client: Client, music: MusicPlayer) {
   const secret = required("BOT_INTERNAL_SECRET");
 

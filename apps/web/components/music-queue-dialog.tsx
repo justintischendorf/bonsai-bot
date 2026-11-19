@@ -1,23 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListPlus } from "lucide-react";
-import { useState } from "react";
+import { Link2, ListMusic, ListPlus, Search } from "lucide-react";
+import { useRef, useState } from "react";
 
+import {
+  FORM_DIALOG_CONTENT,
+  FormDialogFooter,
+  FormDialogHeader,
+  IconField,
+  OrDivider,
+} from "@/components/form-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { musicQueueQueryKey } from "@/hooks/use-music-queue";
 import { apiClient } from "@/lib/api-client";
+import { OUTLINE_BUTTON, PRIMARY_BUTTON } from "@/lib/styles";
+import { cn } from "@/lib/utils";
 
 import LoadingSpinner from "./loading-spinner";
 import { toast } from "./ui/toast";
@@ -25,6 +27,7 @@ import { toast } from "./ui/toast";
 export function MusicQueueDialog() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
+  const firstFieldRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [noInputProvidedError, setNoInputProvidedError] = useState(false);
@@ -74,7 +77,7 @@ export function MusicQueueDialog() {
       <DialogTrigger
         render={
           <Button
-            className="shrink-0 hover:border-bonsai-leaf-light hover:bg-background hover:text-bonsai-leaf-light dark:hover:bg-input/30"
+            className={cn(OUTLINE_BUTTON, "shrink-0")}
             variant="outline"
             type="button"
           >
@@ -83,61 +86,78 @@ export function MusicQueueDialog() {
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent
+        className={FORM_DIALOG_CONTENT}
+        initialFocus={firstFieldRef}
+      >
         <form
-          className="grid gap-4"
+          className="grid gap-6"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}
         >
-          <DialogHeader>
-            <DialogTitle>Song auf die Warteschlange setzen</DialogTitle>
-            <DialogDescription>
-              Gib den Namen oder den YouTube-Link des Songs an, den du hören
-              möchtest. Er wird hinten an die Warteschlange angehängt.
-            </DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="song-title">Song-Name</Label>
-              <Input
-                aria-invalid={noInputProvidedError}
-                id="song-title"
-                name="song-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Bohemian Rhapsody"
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="song-link">Song-Link</Label>
-              <Input
-                aria-invalid={noInputProvidedError}
-                id="song-link"
-                name="song-link"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=fJ9rUzIMcZQ"
-              />
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
+          <FormDialogHeader
+            Icon={ListMusic}
+            eyebrow="Bonsai FM"
+            title="Song hinzufügen"
+          >
+            Gib den Namen oder den YouTube-Link des Songs an. Er wird hinten an
+            die Warteschlange angehängt.
+          </FormDialogHeader>
+          <div className="relative flex flex-col gap-4">
+            <IconField
+              id="song-title"
+              ref={firstFieldRef}
+              label="Song-Name"
+              Icon={Search}
+              aria-invalid={noInputProvidedError}
+              name="song-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Bohemian Rhapsody"
+            />
+            <OrDivider />
+            <IconField
+              id="song-link"
+              label="YouTube-Link"
+              Icon={Link2}
+              href="https://www.youtube.com/"
+              hrefLabel="YouTube"
+              aria-invalid={noInputProvidedError}
+              name="song-link"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=fJ9rUzIMcZQ"
+            />
+          </div>
+          <FormDialogFooter>
             <DialogClose
               render={
-                <Button variant="outline" type="button">
+                <Button
+                  className={OUTLINE_BUTTON}
+                  variant="outline"
+                  type="button"
+                >
                   Abbrechen
                 </Button>
               }
             />
-            <Button type="submit" disabled={isAddingSong}>
+            <Button
+              className={PRIMARY_BUTTON}
+              type="submit"
+              disabled={isAddingSong}
+            >
               {isAddingSong ? (
                 <LoadingSpinner message="Wird hinzugefügt..." />
               ) : (
-                "Zur Warteschlange"
+                <>
+                  <ListPlus />
+                  Zur Warteschlange
+                </>
               )}
             </Button>
-          </DialogFooter>
+          </FormDialogFooter>
         </form>
       </DialogContent>
     </Dialog>

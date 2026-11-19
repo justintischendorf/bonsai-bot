@@ -1,8 +1,6 @@
-# Build-Kontext ist das Repo-Root: docker build -f apps/api/Dockerfile .
 FROM oven/bun:1.4.4-slim AS base
 WORKDIR /app
 
-# Alle Manifeste sind nötig, damit das Lockfile zum Workspace passt.
 FROM base AS manifests
 COPY package.json bun.lock ./
 COPY apps/api/package.json apps/api/
@@ -13,21 +11,18 @@ COPY packages/database/package.json packages/database/
 COPY packages/logger/package.json packages/logger/
 COPY packages/treaty/package.json packages/treaty/
 
-# Komplette Installation mit Prisma-CLI: erzeugt den Client und führt Migrationen aus.
 FROM manifests AS tooling
 RUN bun install --frozen-lockfile
 COPY packages/database/prisma packages/database/prisma
 COPY packages/database/prisma7.config.ts packages/database/
 RUN cd packages/database && DATABASE_URL="file:/tmp/build.db" bunx prisma generate --config prisma7.config.ts
 
-# Einmal-Container für "prisma migrate deploy".
 FROM tooling AS migrate
 RUN mkdir -p /data && chown -R bun:bun /data /app/packages/database
 WORKDIR /app/packages/database
 USER bun
 CMD ["bunx", "prisma", "migrate", "deploy", "--config", "prisma7.config.ts"]
 
-# Nur Laufzeit-Abhängigkeiten.
 FROM manifests AS production-deps
 RUN bun install --frozen-lockfile --production
 
