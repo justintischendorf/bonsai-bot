@@ -51,6 +51,7 @@ export default function DashboardLayout({
               name="discord-server-info"
               isLoading={isDiscordServerInfoLoading}
             >
+              <span className="sm:text-base text-sm">v1.7.0</span>
               <div className="flex h-8 min-w-0 items-center gap-2 rounded-full border border-accent pl-1 pr-1 min-[360px]:pr-3">
                 <Image
                   loading="eager"
@@ -83,7 +84,6 @@ export default function DashboardLayout({
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm text-neutral-500">
             <span>© {currentYear} Bonsai Bot. Alle Rechte vorbehalten.</span>
             <span aria-hidden>·</span>
-            <span className="tabular-nums">v1.7.0</span>
           </div>
         </footer>
       </main>
