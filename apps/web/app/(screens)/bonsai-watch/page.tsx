@@ -22,11 +22,13 @@ export default function BonsaiWatchPage() {
         Icon={TvMinimalPlay}
         actions={<WatchVideoForm className="w-full shrink-0 lg:w-md" />}
       >
-        Hier kannst du zusammen mit anderen <strong>Bonsai Bot</strong> Nutzern{" "}
-        <strong>YouTube Videos</strong> schauen. Füge ein Video über seinen{" "}
-        <strong>Link</strong> hinzu. <strong>Play</strong>,{" "}
-        <strong>Pause</strong> und <strong>Springen</strong> gelten für alle,
-        die gerade zuschauen.
+        Hier kannst du zusammen mit anderen Bonsai Bot Nutzern{" "}
+        <span className="text-bonsai-leaf-light text-bold">YouTube Videos</span>{" "}
+        schauen. Füge ein Video über seinen Link hinzu.{" "}
+        <span className="text-bonsai-leaf-light text-bold">Play</span>,{" "}
+        <span className="text-bonsai-leaf-light text-bold">Pause</span> und{" "}
+        <span className="text-bonsai-leaf-light text-bold">Überspringen</span>{" "}
+        gelten für alle, die gerade zuschauen.
       </PageHeader>
       <Divider />
       <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
