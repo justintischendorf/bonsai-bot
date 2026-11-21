@@ -51,7 +51,7 @@ export default function DashboardLayout({
               name="discord-server-info"
               isLoading={isDiscordServerInfoLoading}
             >
-              <span className="sm:text-base text-sm">v1.7.0</span>
+              <span className="sm:text-base text-sm">v1.7.1</span>
               <div className="flex h-8 min-w-0 items-center gap-2 rounded-full border border-accent pl-1 pr-1 min-[360px]:pr-3">
                 <Image
                   loading="eager"

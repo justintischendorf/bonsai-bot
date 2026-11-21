@@ -8,6 +8,21 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-11-21
+
+### Changed
+
+- The version of the dashboard is shown in the header next to the server
+  info instead of the footer. ([#50])
+- The descriptions at the top of the wishlist, Bonsai FM and Bonsai Watch
+  highlight their keywords in green instead of bold. ([#50])
+- The loading skeletons are measured again for the new design. ([#50])
+
+### Fixed
+
+- Bonsai Watch says "Überspringen" instead of "Springen" in its
+  description. ([#50])
+
 ## [1.7.0] - 2026-11-19
 
 ### Added
@@ -242,7 +257,8 @@ and this project adheres to
   Instant Gaming prices, the music player with Lavalink and the slash
   commands `/ping` and `/link`.
 
-[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/justintischendorf/Bonsai-Bot/compare/v1.4.3...v1.5.0
@@ -286,3 +302,4 @@ and this project adheres to
 [#45]: https://github.com/justintischendorf/Bonsai-Bot/pull/45
 [#46]: https://github.com/justintischendorf/Bonsai-Bot/pull/46
 [#47]: https://github.com/justintischendorf/Bonsai-Bot/pull/47
+[#50]: https://github.com/justintischendorf/Bonsai-Bot/pull/50
