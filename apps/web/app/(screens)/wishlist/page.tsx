@@ -24,11 +24,15 @@ export default function Wishlist() {
         Icon={Gamepad2}
         actions={<WishlistItemDialog />}
       >
-        Hier findest du alle <strong>Spiele</strong>, die auf deiner Wunschliste
-        stehen. Füge neue hinzu, indem du den Link von <strong>Steam</strong>,{" "}
-        <strong>Instant Gaming</strong> oder dem{" "}
-        <strong>PlayStation Store</strong> angibst, oder entferne Spiele, die du
-        nicht mehr brauchst.
+        Hier findest du alle Spiele, die auf deiner Wunschliste stehen. Füge
+        neue hinzu, indem du den Link von{" "}
+        <span className="text-bonsai-leaf-light text-bold">Steam</span>,{" "}
+        <span className="text-bonsai-leaf-light text-bold">Instant Gaming</span>{" "}
+        oder dem{" "}
+        <span className="text-bonsai-leaf-light text-bold">
+          PlayStation Store
+        </span>{" "}
+        angibst, oder entferne Spiele, die du nicht mehr brauchst.
       </PageHeader>
       <Divider />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

@@ -114,10 +114,14 @@ export default function BonsaiFM() {
           </Ghost>
         }
       >
-        Hier startest du eine <strong>Jam</strong> für euren Abend. Geh zuerst
-        in einen <strong>Voice-Channel</strong> und starte dann die Jam, damit{" "}
-        <strong>Bonsai Bot</strong> zu dir in den Channel kommt. Wenn ihr fertig
-        seid, beendest du die Jam einfach wieder.
+        Hier startest du eine{" "}
+        <span className="text-bonsai-leaf-light text-bold">Jam</span> für euren
+        Abend. Geh zuerst in einen{" "}
+        <span className="text-bonsai-leaf-light text-bold">Voice-Channel</span>{" "}
+        und starte dann die Jam, damit{" "}
+        <span className="text-bonsai-leaf-light text-bold">Bonsai Bot</span> zu
+        dir in den Channel kommt. Wenn ihr fertig seid, beendest du die Jam
+        einfach wieder.
       </PageHeader>
       <Divider />
       <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
