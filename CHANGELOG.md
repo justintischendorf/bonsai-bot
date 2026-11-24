@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Bun 1.4.5 instead of 1.4.4 everywhere: in the Docker images, in CI and
+  in `package.json`. ([#53], [#55])
+
 ## [1.7.1] - 2026-11-21
 
 ### Changed
@@ -303,3 +308,5 @@ and this project adheres to
 [#46]: https://github.com/justintischendorf/Bonsai-Bot/pull/46
 [#47]: https://github.com/justintischendorf/Bonsai-Bot/pull/47
 [#50]: https://github.com/justintischendorf/Bonsai-Bot/pull/50
+[#53]: https://github.com/justintischendorf/Bonsai-Bot/pull/53
+[#55]: https://github.com/justintischendorf/Bonsai-Bot/pull/55

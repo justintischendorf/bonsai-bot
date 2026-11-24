@@ -89,7 +89,7 @@ production.
 ## Development
 
 API and dashboard run locally with hot reload, the bot, Lavalink and
-yt-cipher run in Docker. You need [Bun](https://bun.sh/) 1.4.4, Node.js 24,
+yt-cipher run in Docker. You need [Bun](https://bun.sh/) 1.4.5, Node.js 24,
 Docker with Docker Compose and an application in the
 [Discord Developer Portal](https://discord.com/developers/applications) with
 a bot and OAuth2.
